@@ -35,7 +35,10 @@ export function makeHttpHandler({config,broker,mcpHandler,audit}) {
       const url=new URL(req.url,config.origin);route=url.pathname;
       if(url.origin!==config.origin)fail('invalid_request','Absolute request target is not allowed.');
       const origin=req.headers.origin;
-      if(origin && origin!==config.origin && !config.allowedOrigins.includes(origin))fail('invalid_request','Origin is not allowed.',403);
+      // Origin is only meaningful on state-changing requests; embedded browser panes may
+      // send 'null' (opaque webview origin). Token auth, the flow cookie and CSRF still bind
+      // these routes; cross-origin reads stay blocked because CORS headers are never granted.
+      if(!['GET','HEAD'].includes(req.method)&&origin&&origin!=='null'&&origin!==config.origin&&!config.allowedOrigins.includes(origin))fail('invalid_request','Origin is not allowed.',403);
       if(origin && config.allowedOrigins.includes(origin)){res.setHeader('Access-Control-Allow-Origin',origin);res.setHeader('Vary','Origin');res.setHeader('Access-Control-Expose-Headers','WWW-Authenticate, MCP-Session-Id, MCP-Protocol-Version, X-Request-Id');}
       if(req.method==='OPTIONS') {
         if(!origin)fail('invalid_request','Origin required for preflight.');
@@ -68,7 +71,7 @@ export function makeHttpHandler({config,broker,mcpHandler,audit}) {
         res.end(`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Authorize TIDAL MCP</title><style>body{font:16px/1.5 system-ui;color:#2a302e;background:#fcfcfc;margin:40px auto;padding:24px;max-width:640px}button{padding:10px 18px;margin:12px 8px 0 0;border:1px solid #cfceca;border-radius:9999px;background:white;color:#2a302e;cursor:pointer}button[value=approve]{background:#2a302e;color:white}code{overflow-wrap:anywhere}button:focus-visible{outline:3px solid #2c5d63;outline-offset:3px}</style><main><h1>Connect your TIDAL account</h1><p><strong>${escapeHtml(view.clientName)}</strong> requests access through this MCP server.</p><p>Permissions: <strong>${escapeHtml(view.scopes.join(', '))}</strong>.</p><p>${view.scopes.includes('tidal:write')?'This permits changes to playlists and saved music. Only approve a client you trust to follow your instructions.':'This is read-only access to your profile, playlists and saved music.'}</p><p>You will authenticate on TIDAL. Your TIDAL tokens stay on this server and are not sent to the AI client.</p><p>Client callback: <code>${escapeHtml(view.redirectUri)}</code></p><form method="post" action="/consent"><input type="hidden" name="consent_id" value="${escapeHtml(view.consentId)}"><input type="hidden" name="csrf" value="${escapeHtml(view.csrf)}"><button name="decision" value="approve">Continue to TIDAL</button><button name="decision" value="deny">Cancel</button></form></main></html>`);return;
       }
       if(route==='/consent'&&req.method==='POST') {
-        if(origin!==config.origin)fail('invalid_request','Consent requires a same-origin browser submission.',403);
+        if(origin!==config.origin&&origin!=='null')fail('invalid_request','Consent requires a same-origin browser submission.',403);
         if(!String(req.headers['content-type']).startsWith('application/x-www-form-urlencoded'))fail('invalid_request','Expected form body.',415);
         const form=parameters(await requestBody(req));const result=await broker.consent(form.consent_id,form.csrf,cookieValue(req.headers.cookie,cookieName),form.decision==='approve');status=302;return redirect(res,result.url,form.decision!=='approve');
       }
