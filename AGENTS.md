@@ -6,7 +6,7 @@ TIDAL catalogue/library MCP server with an optional MCP Apps UI. Plain Node.js E
 
 - CI gate: `npm run verify` = `check` → `build` → `test` → `test:mcp`, then `test:browser` (needs `npx playwright install chromium` first).
 - `npm run check` is the only lint: `node --check` syntax over every `.mjs` plus CSS-variable resolution. There is no ESLint or `tsc`; it does not validate SDK imports or types (`types/contracts.d.ts` is hand-maintained, not compiled).
-- Tests are separate evidence classes (see `docs/TESTING.md`): `npm test` (65 core tests, dependency-free, synthetic upstream), `npm run test:mcp` (real official MCP/TIDAL SDKs over stdio — missing packages fail the run, they never skip), `npm run test:browser`, `npm run test:coverage`, `python tests/browser/run.py` (alternate Python harness, own loopback on 3017; `CHROMIUM_EXECUTABLE` reuses an installed browser).
+- Tests are separate evidence classes (see `docs/TESTING.md`): `npm test` (77 core tests, dependency-free, synthetic upstream), `npm run test:mcp` (real official MCP/TIDAL SDKs over stdio — missing packages fail the run, they never skip), `npm run test:browser`, `npm run test:coverage`, `python tests/browser/run.py` (alternate Python harness, own loopback on 3017; `CHROMIUM_EXECUTABLE` reuses an installed browser).
 - Single test file: `node --test tests/core/<name>.test.mjs` (Node's built-in runner; no vitest/jest).
 - Credential-free demo: `node scripts/demo.mjs` → http://127.0.0.1:3010 with fictional in-memory data. The production entry (`src/main.mjs`) never falls back to it.
 
@@ -14,7 +14,7 @@ TIDAL catalogue/library MCP server with an optional MCP Apps UI. Plain Node.js E
 
 - `web/tokens.css` + `audit/design-token-map.json`: regenerated from `design-source/` by `scripts/tokens.mjs`, which runs at the start of every `npm run build`.
 - `docs/tools.json`, `docs/TOOL_REFERENCE.md`, `docs/endpoint-allowlist.json`: `npm run docs`.
-- `dist/widget.html` + `dist/build-manifest.json`: build output (gitignored).
+- `dist/widget.html` + `dist/widget-resource.mjs` + `dist/build-manifest.json`: build output (gitignored). The function imports `widget-resource.mjs`, so `npm run build` must run before bundling `netlify/`.
 - `npm run schema:refresh` downloads the TIDAL OAS into `docs/upstream/` (network).
 - Keep contracts, payload compiler/plan previews, scope checks, fixtures, negative tests and generated docs in sync when changing tools.
 
@@ -25,6 +25,10 @@ TIDAL catalogue/library MCP server with an optional MCP Apps UI. Plain Node.js E
 - For an agent-launched stdio client use `node --env-file=/absolute/path/.env /absolute/path/src/main.mjs --stdio` — never `npm run stdio`, because npm writes non-protocol text to stdout. Set `DATA_DIR` to an absolute path in `.env`.
 - `npm run login` / `npm run logout` manage the local stdio profile (loopback callback `http://127.0.0.1:8765/callback`).
 - `ENABLE_WRITES=false` stays false unless a human explicitly approves a write test; `confirm: true` in a tool call is not human approval. Preserve duplicate occurrence IDs, exact preview digests and idempotency keys across uncertain writes; never create a replacement mutation to recover from an unknown outcome.
+
+## Netlify deployment (tidalmcp.netlify.app)
+
+`netlify/functions/server.mjs` runs the same handlers as `src/main.mjs` on Netlify Functions: `src/core/web-adapter.mjs` bridges web `Request`/`Response` to the Node-style `(req,res)` surface, and `src/core/blobs-store.mjs` (`BlobsStore`/`BlobsAudit`) persists state to a site-wide Blobs store with whole-document CAS. `store.tx()` is async on every store; always `await` it. CAS rejection re-runs the transaction on fresh state; an indeterminate write outcome fails closed (`STORE_WRITE_UNKNOWN`) and must never be retried blindly. Keep writes disabled in production until a human approves them.
 
 ## Hard rules
 
