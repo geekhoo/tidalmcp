@@ -1,0 +1,5 @@
+
+> tidal-mcp-app@1.0.0 build
+> node scripts/build.mjs
+
+esbuild is not installed. Run npm install before building the production MCP Apps resource.

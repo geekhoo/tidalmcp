@@ -1,0 +1,86 @@
+{
+  "semantic": {
+    "color": {
+      "surface": {
+        "$type": "color",
+        "canvas": { "$value": "{primitive.color.paper.50}" },
+        "window": { "$value": "{primitive.color.paper.100}" },
+        "raised": { "$value": "{primitive.color.paper.0}" },
+        "sunken": { "$value": "{primitive.color.stone.100}" }
+      },
+      "text": {
+        "$type": "color",
+        "primary": { "$value": "{primitive.color.ink.900}" },
+        "secondary": { "$value": "{primitive.color.ink.700}" },
+        "tertiary": { "$value": "{primitive.color.ink.600}" },
+        "inverse": { "$value": "{primitive.color.paper.0}" },
+        "accent": { "$value": "{primitive.color.teal.700}" },
+        "disabled": { "$value": "{primitive.color.stone.400}" }
+      },
+      "line": {
+        "$type": "color",
+        "subtle": { "$value": "{primitive.color.stone.200}" },
+        "strong": { "$value": "{primitive.color.stone.300}" },
+        "rule": { "$value": "{primitive.color.stone.400}" },
+        "accent": { "$value": "{primitive.color.teal.700}" }
+      },
+      "interaction": {
+        "$type": "color",
+        "hover": { "$value": "rgba(42, 48, 46, 0.045)" },
+        "active": { "$value": "rgba(42, 48, 46, 0.08)" },
+        "selected": { "$value": "rgba(44, 93, 99, 0.1)" },
+        "focus": { "$value": "rgba(44, 93, 99, 0.22)" }
+      },
+      "status": {
+        "$type": "color",
+        "success": { "$value": "{primitive.color.status.success}" },
+        "successTint": { "$value": "{primitive.color.status.success-tint}" },
+        "danger": { "$value": "{primitive.color.status.danger}" },
+        "dangerTint": { "$value": "{primitive.color.status.danger-tint}" },
+        "warning": { "$value": "{primitive.color.status.warning}" },
+        "warningTint": { "$value": "{primitive.color.status.warning-tint}" }
+      },
+      "verdict": {
+        "$type": "color",
+        "true": { "$value": "#477259" },
+        "trueTint": { "$value": "#eaf0eb" },
+        "false": { "$value": "#99544d" },
+        "falseTint": { "$value": "#f4eae8" }
+      }
+    },
+    "space": {
+      "$type": "dimension",
+      "inset": {
+        "xs": { "$value": "{primitive.space.2}" },
+        "sm": { "$value": "{primitive.space.4}" },
+        "md": { "$value": "{primitive.space.7}" },
+        "lg": { "$value": "{primitive.space.9}" }
+      },
+      "inline": {
+        "xs": { "$value": "{primitive.space.2}" },
+        "sm": { "$value": "{primitive.space.3}" },
+        "md": { "$value": "{primitive.space.5}" }
+      },
+      "stack": {
+        "xs": { "$value": "{primitive.space.2}" },
+        "sm": { "$value": "{primitive.space.4}" },
+        "md": { "$value": "{primitive.space.5}" },
+        "lg": { "$value": "{primitive.space.10}" },
+        "xl": { "$value": "{primitive.space.11}" }
+      }
+    },
+    "radius": {
+      "$type": "dimension",
+      "field": { "$value": "{primitive.radius.sm}" },
+      "surface": { "$value": "{primitive.radius.md}" },
+      "pill": { "$value": "{primitive.radius.pill}" }
+    },
+    "shadow": {
+      "$type": "shadow",
+      "rest": { "$value": "{primitive.shadow.xs}" },
+      "hover": { "$value": "{primitive.shadow.sm}" },
+      "raised": { "$value": "{primitive.shadow.md}" },
+      "popup": { "$value": "{primitive.shadow.popup}" }
+    }
+  }
+}

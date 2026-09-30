@@ -1,0 +1,13 @@
+{
+  "semantic": {
+    "layout": {
+      "contentMeasure": { "$type": "dimension", "$value": "720px", "$description": "Readable content shell." },
+      "chromeMeasure": { "$type": "dimension", "$value": "880px", "$description": "Topbar and footer measure." },
+      "gridMinColumn": { "$type": "dimension", "$value": "320px" },
+      "topbarHeight": { "$type": "dimension", "$value": "48px" },
+      "controlHeight": { "$type": "dimension", "$value": "32px" },
+      "controlHeightSmall": { "$type": "dimension", "$value": "28px" },
+      "controlHeightCompact": { "$type": "dimension", "$value": "24px" }
+    }
+  }
+}

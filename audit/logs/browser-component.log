@@ -1,0 +1,80 @@
+{
+  "status": "passed",
+  "count": 18,
+  "browser": "Chromium 144.0.7559.96",
+  "scope": "Component rendering and interactions via injected adapter to the real local demo HTTP service; not MCP Apps bridge, production bundle, hosted ChatGPT/Codex, or live TIDAL.",
+  "tests": [
+    {
+      "name": "initial results render",
+      "status": "passed"
+    },
+    {
+      "name": "canvas design token applied",
+      "status": "passed"
+    },
+    {
+      "name": "fictional-data banner visible",
+      "status": "passed"
+    },
+    {
+      "name": "empty search state renders",
+      "status": "passed"
+    },
+    {
+      "name": "selection actions appear",
+      "status": "passed"
+    },
+    {
+      "name": "write requires visible preview",
+      "status": "passed"
+    },
+    {
+      "name": "preview can be cancelled",
+      "status": "passed"
+    },
+    {
+      "name": "form validation stays visible inside modal",
+      "status": "passed"
+    },
+    {
+      "name": "preview exposes visibility and endpoint",
+      "status": "passed"
+    },
+    {
+      "name": "explicit confirmation applies synthetic write",
+      "status": "passed"
+    },
+    {
+      "name": "created playlist appears in owned list",
+      "status": "passed"
+    },
+    {
+      "name": "mobile has no horizontal overflow",
+      "status": "passed"
+    },
+    {
+      "name": "keyboard focus is active",
+      "status": "passed"
+    },
+    {
+      "name": "untrusted title is text not HTML",
+      "status": "passed"
+    },
+    {
+      "name": "unsafe links not rendered",
+      "status": "passed"
+    },
+    {
+      "name": "inline hides multi-step navigation",
+      "status": "passed"
+    },
+    {
+      "name": "host-delivered first page can paginate",
+      "status": "passed"
+    },
+    {
+      "name": "no JavaScript page errors",
+      "status": "passed"
+    }
+  ]
+}

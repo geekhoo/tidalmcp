@@ -1,0 +1,27 @@
+{
+  "date": "2026-09-30",
+  "disposition": "source-delivery-production-acceptance-pending",
+  "coreTests": {
+    "passed": 65,
+    "failed": 0,
+    "skipped": 0
+  },
+  "browserComponentChecks": {
+    "passed": 18,
+    "bridge": "injected synthetic adapter, not official MCP Apps host"
+  },
+  "productionSdkIntegration": "blocked_missing_dependencies",
+  "productionBuild": "blocked_missing_esbuild",
+  "liveTidal": "not_run_no_credentials",
+  "hostedClients": "not_run_no_deployment",
+  "dependencyAudit": "not_run",
+  "designInput": {
+    "filename": "design.zip",
+    "sha256": "d67da31c6f57e0823c8b8d082258c90f945eb20c69e118ad0d8fa8b43f88f816",
+    "resolvedTokenCount": 155
+  },
+  "fullUpstreamSnapshot": "not_locally_archived",
+  "selectedApiBindings": 43,
+  "tools": 12,
+  "changeActions": 8
+}

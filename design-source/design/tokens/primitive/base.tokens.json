@@ -1,0 +1,121 @@
+{
+  "primitive": {
+    "color": {
+      "$type": "color",
+      "ink": {
+        "900": { "$value": "#2a302e", "$description": "Warm near-black with a green undertone." },
+        "800": { "$value": "#3c4240" },
+        "700": { "$value": "#5f6563" },
+        "600": { "$value": "#757b78" },
+        "500": { "$value": "#8c8c8c" }
+      },
+      "stone": {
+        "400": { "$value": "#b9bcb8" },
+        "300": { "$value": "#cfceca" },
+        "200": { "$value": "#e2e1de" },
+        "100": { "$value": "#eeedea" }
+      },
+      "paper": {
+        "100": { "$value": "#fafaf9" },
+        "50": { "$value": "#fcfcfc" },
+        "0": { "$value": "#ffffff" }
+      },
+      "teal": {
+        "900": { "$value": "#1c3f44" },
+        "700": { "$value": "#2c5d63" },
+        "500": { "$value": "#3f7c84" },
+        "100": { "$value": "#e6eef0" }
+      },
+      "status": {
+        "success": { "$value": "#2e7649" },
+        "success-tint": { "$value": "#e7f1ea" },
+        "warning": { "$value": "#8a6316" },
+        "warning-tint": { "$value": "#f6efdd" },
+        "danger": { "$value": "#a8322c" },
+        "danger-tint": { "$value": "#f7e8e6" },
+        "info": { "$value": "#2b6180" },
+        "info-tint": { "$value": "#e6eef4" },
+        "violet": { "$value": "#5b4a86" },
+        "violet-tint": { "$value": "#ece9f4" }
+      }
+    },
+    "font": {
+      "$type": "fontFamily",
+      "sans": { "$value": "Satoshi, Inter, system-ui, -apple-system, \"Segoe UI\", sans-serif" },
+      "mono": { "$value": "SF Mono, JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" }
+    },
+    "fontSize": {
+      "$type": "dimension",
+      "meta": { "$value": "0.6875rem" },
+      "code": { "$value": "0.75rem" },
+      "body": { "$value": "0.8125rem" },
+      "title": { "$value": "0.9375rem" },
+      "section": { "$value": "1.125rem" },
+      "metric": { "$value": "1.5rem" },
+      "lede": { "$value": "2.5rem" }
+    },
+    "lineHeight": {
+      "$type": "number",
+      "meta": { "$value": "1.09" },
+      "body": { "$value": "1.3" },
+      "title": { "$value": "1.333" },
+      "section": { "$value": "1.333" },
+      "metric": { "$value": "1.3" },
+      "lede": { "$value": "1.3" },
+      "code": { "$value": "1.7" }
+    },
+    "fontWeight": {
+      "$type": "number",
+      "regular": { "$value": 400 },
+      "medium": { "$value": 500 },
+      "bold": { "$value": 700 }
+    },
+    "tracking": {
+      "$type": "dimension",
+      "tight": { "$value": "-0.03em" },
+      "snug": { "$value": "-0.02em" },
+      "wide": { "$value": "0.02em" }
+    },
+    "space": {
+      "$type": "dimension",
+      "1": { "$value": "2px" },
+      "2": { "$value": "4px" },
+      "3": { "$value": "8px" },
+      "4": { "$value": "12px" },
+      "5": { "$value": "16px" },
+      "6": { "$value": "20px" },
+      "7": { "$value": "24px" },
+      "8": { "$value": "32px" },
+      "9": { "$value": "40px" },
+      "10": { "$value": "56px" },
+      "11": { "$value": "72px" }
+    },
+    "radius": {
+      "$type": "dimension",
+      "xs": { "$value": "2px" },
+      "sm": { "$value": "4px" },
+      "md": { "$value": "8px" },
+      "lg": { "$value": "12px" },
+      "pill": { "$value": "9999px" }
+    },
+    "shadow": {
+      "$type": "shadow",
+      "xs": { "$value": "0 1px 1px rgba(42, 48, 46, 0.04), 0 1px 2px rgba(42, 48, 46, 0.06)" },
+      "sm": { "$value": "0 1px 2px rgba(42, 48, 46, 0.06), 0 2px 6px -2px rgba(42, 48, 46, 0.1)" },
+      "md": { "$value": "0 2px 4px rgba(42, 48, 46, 0.07), 0 8px 20px -8px rgba(42, 48, 46, 0.16)" },
+      "popup": { "$value": "0 2px 6px rgba(42, 48, 46, 0.08), 0 16px 32px -12px rgba(42, 48, 46, 0.22)" }
+    },
+    "motion": {
+      "duration": {
+        "$type": "duration",
+        "fast": { "$value": "120ms" },
+        "base": { "$value": "180ms" },
+        "slow": { "$value": "260ms" }
+      },
+      "easing": {
+        "$type": "cubicBezier",
+        "standard": { "$value": [0.2, 0, 0, 1] }
+      }
+    }
+  }
+}

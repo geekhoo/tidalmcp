@@ -1,0 +1,395 @@
+{
+  "schemaVersion": "1.10.91",
+  "source": "https://tidal-music.github.io/tidal-api-reference/tidal-api-oas.json",
+  "coverage": "Curated implemented operations, NOT a complete published OpenAPI snapshot.",
+  "count": 43,
+  "operations": [
+    {
+      "method": "GET",
+      "path": "/searchResults/{id}/relationships/tracks",
+      "scope": "client credentials or search.read",
+      "tool": "tidal_search",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/tracks/{id}",
+      "scope": "catalogue; playlists.read for linked account playlists",
+      "tool": "tidal_get",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/searchResults/{id}/relationships/albums",
+      "scope": "client credentials or search.read",
+      "tool": "tidal_search",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/albums/{id}",
+      "scope": "catalogue; playlists.read for linked account playlists",
+      "tool": "tidal_get",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/searchResults/{id}/relationships/artists",
+      "scope": "client credentials or search.read",
+      "tool": "tidal_search",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/artists/{id}",
+      "scope": "catalogue; playlists.read for linked account playlists",
+      "tool": "tidal_get",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/searchResults/{id}/relationships/playlists",
+      "scope": "client credentials or search.read",
+      "tool": "tidal_search",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/playlists/{id}",
+      "scope": "catalogue; playlists.read for linked account playlists",
+      "tool": "tidal_get",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/searchResults/{id}/relationships/videos",
+      "scope": "client credentials or search.read",
+      "tool": "tidal_search",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/videos/{id}",
+      "scope": "catalogue; playlists.read for linked account playlists",
+      "tool": "tidal_get",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/albums/{id}/relationships/items",
+      "scope": "catalogue",
+      "tool": "tidal_related",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/albums/{id}/relationships/artists",
+      "scope": "catalogue",
+      "tool": "tidal_related",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/artists/{id}/relationships/albums",
+      "scope": "catalogue",
+      "tool": "tidal_related",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/artists/{id}/relationships/tracks",
+      "scope": "catalogue",
+      "tool": "tidal_related",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/tracks/{id}/relationships/albums",
+      "scope": "catalogue",
+      "tool": "tidal_related",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/tracks/{id}/relationships/artists",
+      "scope": "catalogue",
+      "tool": "tidal_related",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/tracks/{id}/relationships/radio",
+      "scope": "catalogue",
+      "tool": "tidal_related",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/tracks/{id}/relationships/similarTracks",
+      "scope": "catalogue",
+      "tool": "tidal_related",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/playlists/{id}/relationships/items",
+      "scope": "playlists.read",
+      "tool": "tidal_related",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/playlists/{id}/relationships/coverArt",
+      "scope": "playlists.read",
+      "tool": "tidal_related",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/users/{id}",
+      "scope": "user.read",
+      "tool": "tidal_get_me",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/playlists",
+      "scope": "playlists.read",
+      "tool": "tidal_list_playlists",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/userCollectionAlbums/{id}/relationships/items",
+      "scope": "collection.read",
+      "tool": "tidal_list_collection",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "POST",
+      "path": "/userCollectionAlbums/{id}/relationships/items",
+      "scope": "collection.write",
+      "tool": "tidal_prepare_change → tidal_commit_change",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "DELETE",
+      "path": "/userCollectionAlbums/{id}/relationships/items",
+      "scope": "collection.write",
+      "tool": "tidal_prepare_change → tidal_commit_change",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/userCollectionArtists/{id}/relationships/items",
+      "scope": "collection.read",
+      "tool": "tidal_list_collection",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "POST",
+      "path": "/userCollectionArtists/{id}/relationships/items",
+      "scope": "collection.write",
+      "tool": "tidal_prepare_change → tidal_commit_change",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "DELETE",
+      "path": "/userCollectionArtists/{id}/relationships/items",
+      "scope": "collection.write",
+      "tool": "tidal_prepare_change → tidal_commit_change",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/userCollectionTracks/{id}/relationships/items",
+      "scope": "collection.read",
+      "tool": "tidal_list_collection",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "POST",
+      "path": "/userCollectionTracks/{id}/relationships/items",
+      "scope": "collection.write",
+      "tool": "tidal_prepare_change → tidal_commit_change",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "DELETE",
+      "path": "/userCollectionTracks/{id}/relationships/items",
+      "scope": "collection.write",
+      "tool": "tidal_prepare_change → tidal_commit_change",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/userCollectionVideos/{id}/relationships/items",
+      "scope": "collection.read",
+      "tool": "tidal_list_collection",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "POST",
+      "path": "/userCollectionVideos/{id}/relationships/items",
+      "scope": "collection.write",
+      "tool": "tidal_prepare_change → tidal_commit_change",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "DELETE",
+      "path": "/userCollectionVideos/{id}/relationships/items",
+      "scope": "collection.write",
+      "tool": "tidal_prepare_change → tidal_commit_change",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "GET",
+      "path": "/userCollectionPlaylists/{id}/relationships/items",
+      "scope": "collection.read",
+      "tool": "tidal_list_collection",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "POST",
+      "path": "/userCollectionPlaylists/{id}/relationships/items",
+      "scope": "collection.write",
+      "tool": "tidal_prepare_change → tidal_commit_change",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "DELETE",
+      "path": "/userCollectionPlaylists/{id}/relationships/items",
+      "scope": "collection.write",
+      "tool": "tidal_prepare_change → tidal_commit_change",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "POST",
+      "path": "/playlists",
+      "scope": "playlists.write",
+      "tool": "create_playlist",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "PATCH",
+      "path": "/playlists/{id}",
+      "scope": "playlists.write",
+      "tool": "update_playlist",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "DELETE",
+      "path": "/playlists/{id}",
+      "scope": "playlists.write",
+      "tool": "delete_playlist",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "POST",
+      "path": "/playlists/{id}/relationships/items",
+      "scope": "playlists.write",
+      "tool": "playlist item changes",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "DELETE",
+      "path": "/playlists/{id}/relationships/items",
+      "scope": "playlists.write",
+      "tool": "playlist item changes",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    },
+    {
+      "method": "PATCH",
+      "path": "/playlists/{id}/relationships/items",
+      "scope": "playlists.write",
+      "tool": "playlist item changes",
+      "status": "implemented_allowlist",
+      "tier": "THIRD_PARTY",
+      "evidence": "Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory."
+    }
+  ]
+}

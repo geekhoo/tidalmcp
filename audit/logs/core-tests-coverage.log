@@ -1,0 +1,434 @@
+TAP version 13
+# Subtest: PKCE authorization creates distinct MCP tokens and preserves agent state
+ok 1 - PKCE authorization creates distinct MCP tokens and preserves agent state
+  ---
+  duration_ms: 40.040696
+  type: 'test'
+  ...
+# Subtest: unregistered redirect URI and non-S256 PKCE are rejected
+ok 2 - unregistered redirect URI and non-S256 PKCE are rejected
+  ---
+  duration_ms: 1.068845
+  type: 'test'
+  ...
+# Subtest: consent CSRF and browser binding are enforced before upstream login
+ok 3 - consent CSRF and browser binding are enforced before upstream login
+  ---
+  duration_ms: 0.768309
+  type: 'test'
+  ...
+# Subtest: upstream callback state is single-use
+ok 4 - upstream callback state is single-use
+  ---
+  duration_ms: 4.913512
+  type: 'test'
+  ...
+# Subtest: wrong code verifier or resource cannot exchange a bound code
+ok 5 - wrong code verifier or resource cannot exchange a bound code
+  ---
+  duration_ms: 3.575805
+  type: 'test'
+  ...
+# Subtest: rotating refresh replay revokes the whole client token family
+ok 6 - rotating refresh replay revokes the whole client token family
+  ---
+  duration_ms: 3.11983
+  type: 'test'
+  ...
+# Subtest: refresh rejects scope escalation and other-client token substitution
+ok 7 - refresh rejects scope escalation and other-client token substitution
+  ---
+  duration_ms: 2.496982
+  type: 'test'
+  ...
+# Subtest: access token expiry is enforced, and refresh can renew before family expiry
+ok 8 - access token expiry is enforced, and refresh can renew before family expiry
+  ---
+  duration_ms: 2.430929
+  type: 'test'
+  ...
+# Subtest: concurrent upstream token refresh is single-flight
+ok 9 - concurrent upstream token refresh is single-flight
+  ---
+  duration_ms: 3.279509
+  type: 'test'
+  ...
+# Subtest: upstream refresh omission preserves prior refresh token
+ok 10 - upstream refresh omission preserves prior refresh token
+  ---
+  duration_ms: 1.471479
+  type: 'test'
+  ...
+# Subtest: invalid_grant clears upstream secrets and forces reconnect
+ok 11 - invalid_grant clears upstream secrets and forces reconnect
+  ---
+  duration_ms: 1.055801
+  type: 'test'
+  ...
+# Subtest: disconnect cannot be undone by a refresh finishing late
+ok 12 - disconnect cannot be undone by a refresh finishing late
+  ---
+  duration_ms: 1.201497
+  type: 'test'
+  ...
+# Subtest: revocation does not reveal whether an unknown token exists
+ok 13 - revocation does not reveal whether an unknown token exists
+  ---
+  duration_ms: 0.39731
+  type: 'test'
+  ...
+# Subtest: GET retries transient failures but remains bounded
+ok 14 - GET retries transient failures but remains bounded
+  ---
+  duration_ms: 53.813154
+  type: 'test'
+  ...
+# Subtest: GET refreshes a rejected user token once, then succeeds
+ok 15 - GET refreshes a rejected user token once, then succeeds
+  ---
+  duration_ms: 3.887608
+  type: 'test'
+  ...
+# Subtest: mutations are not retried automatically on network failure
+ok 16 - mutations are not retried automatically on network failure
+  ---
+  duration_ms: 0.8825
+  type: 'test'
+  ...
+# Subtest: 204 write responses are supported
+ok 17 - 204 write responses are supported
+  ---
+  duration_ms: 0.723502
+  type: 'test'
+  ...
+# Subtest: untrusted upstream error detail is not exposed
+ok 18 - untrusted upstream error detail is not exposed
+  ---
+  duration_ms: 3.835285
+  type: 'test'
+  ...
+# Subtest: pagination accepts only a cursor on the exact fixed-origin route
+ok 19 - pagination accepts only a cursor on the exact fixed-origin route
+  ---
+  duration_ms: 0.483223
+  type: 'test'
+  ...
+# Subtest: normalization keeps linkage order, duplicates, and occurrence identities
+ok 20 - normalization keeps linkage order, duplicates, and occurrence identities
+  ---
+  duration_ms: 2.016982
+  type: 'test'
+  ...
+# Subtest: HTML and prompt-like titles remain data rather than markup
+ok 21 - HTML and prompt-like titles remain data rather than markup
+  ---
+  duration_ms: 0.233261
+  type: 'test'
+  ...
+# Subtest: bounded reading rejects announced and streamed oversized responses
+ok 22 - bounded reading rejects announced and streamed oversized responses
+  ---
+  duration_ms: 1.246009
+  type: 'test'
+  ...
+# Subtest: safe external and artwork URLs reject schemes, credential tricks, and host suffixes
+ok 23 - safe external and artwork URLs reject schemes, credential tricks, and host suffixes
+  ---
+  duration_ms: 0.348293
+  type: 'test'
+  ...
+# Subtest: resource IDs remain encoded single segments and dot IDs are rejected
+ok 24 - resource IDs remain encoded single segments and dot IDs are rejected
+  ---
+  duration_ms: 0.411113
+  type: 'test'
+  ...
+# Subtest: Retry-After values are capped and invalid values have a safe default
+ok 25 - Retry-After values are capped and invalid values have a safe default
+  ---
+  duration_ms: 0.188688
+  type: 'test'
+  ...
+# Subtest: host-originated read outputs preserve arguments for UI pagination
+ok 26 - host-originated read outputs preserve arguments for UI pagination
+  ---
+  duration_ms: 5.827332
+  type: 'test'
+  ...
+# Subtest: all tool names are unique and schemas reject unknown properties
+ok 27 - all tool names are unique and schemas reject unknown properties
+  ---
+  duration_ms: 2.683682
+  type: 'test'
+  ...
+# Subtest: search country, cursor and enum validation
+ok 28 - search country, cursor and enum validation
+  ---
+  duration_ms: 0.56333
+  type: 'test'
+  ...
+# Subtest: private visibility is not a valid playlist create input
+ok 29 - private visibility is not a valid playlist create input
+  ---
+  duration_ms: 0.714266
+  type: 'test'
+  ...
+# Subtest: duplicate-safe remove requires an occurrence itemId
+ok 30 - duplicate-safe remove requires an occurrence itemId
+  ---
+  duration_ms: 2.067725
+  type: 'test'
+  ...
+# Subtest: playlist operation batch limits are 50 add/remove and 20 move
+ok 31 - playlist operation batch limits are 50 add/remove and 20 move
+  ---
+  duration_ms: 0.83335
+  type: 'test'
+  ...
+# Subtest: unknown operations and internal relationships cannot reach TIDAL
+ok 32 - unknown operations and internal relationships cannot reach TIDAL
+  ---
+  duration_ms: 6.27835
+  type: 'test'
+  ...
+# Subtest: collection requests use me and omit unsupported countryCode
+ok 33 - collection requests use me and omit unsupported countryCode
+  ---
+  duration_ms: 45.912041
+  type: 'test'
+  ...
+# Subtest: all five collection resource kinds produce exact payload types
+ok 34 - all five collection resource kinds produce exact payload types
+  ---
+  duration_ms: 3.664456
+  type: 'test'
+  ...
+# Subtest: public text and metadata are data, not executable instructions
+ok 35 - public text and metadata are data, not executable instructions
+  ---
+  duration_ms: 4.767255
+  type: 'test'
+  ...
+# Subtest: semantic aliases and bezier arrays resolve without framework dependencies
+ok 36 - semantic aliases and bezier arrays resolve without framework dependencies
+  ---
+  duration_ms: 3.934815
+  type: 'test'
+  ...
+# Subtest: cyclic or missing design aliases fail instead of producing invalid CSS
+ok 37 - cyclic or missing design aliases fail instead of producing invalid CSS
+  ---
+  duration_ms: 0.676436
+  type: 'test'
+  ...
+# Subtest: all 155 supplied production tokens retain source hashes and resolve
+ok 38 - all 155 supplied production tokens retain source hashes and resolve
+  ---
+  duration_ms: 3.868888
+  type: 'test'
+  ...
+# Subtest: generated styles contain no unresolved semantic aliases
+ok 39 - generated styles contain no unresolved semantic aliases
+  ---
+  duration_ms: 0.256484
+  type: 'test'
+  ...
+# Subtest: HTTP OAuth consent, PKCE callback, token exchange, and principal binding work end-to-end
+ok 40 - HTTP OAuth consent, PKCE callback, token exchange, and principal binding work end-to-end
+  ---
+  duration_ms: 100.637049
+  type: 'test'
+  ...
+# Subtest: HTTP unauthenticated MCP requests are challenged before tool dispatch
+ok 41 - HTTP unauthenticated MCP requests are challenged before tool dispatch
+  ---
+  duration_ms: 14.762055
+  type: 'test'
+  ...
+# Subtest: OAuth discovery advertises exact resource and public S256 client flow
+ok 42 - OAuth discovery advertises exact resource and public S256 client flow
+  ---
+  duration_ms: 8.623394
+  type: 'test'
+  ...
+# Subtest: Host header and unapproved browser Origin are rejected
+ok 43 - Host header and unapproved browser Origin are rejected
+  ---
+  duration_ms: 11.022202
+  type: 'test'
+  ...
+# Subtest: malformed JSON and duplicate OAuth form parameters fail without leaking data
+ok 44 - malformed JSON and duplicate OAuth form parameters fail without leaking data
+  ---
+  duration_ms: 8.947724
+  type: 'test'
+  ...
+# Subtest: oversized authorization payloads fail with 413
+ok 45 - oversized authorization payloads fail with 413
+  ---
+  duration_ms: 5.469724
+  type: 'test'
+  ...
+# Subtest: revoked MCP access is denied on the next HTTP request
+ok 46 - revoked MCP access is denied on the next HTTP request
+  ---
+  duration_ms: 20.217628
+  type: 'test'
+  ...
+# Subtest: preparation never performs a TIDAL write; commit replays are idempotent
+ok 47 - preparation never performs a TIDAL write; commit replays are idempotent
+  ---
+  duration_ms: 51.802633
+  type: 'test'
+  ...
+# Subtest: write needs operator opt-in, MCP write scope and upstream write scope
+ok 48 - write needs operator opt-in, MCP write scope and upstream write scope
+  ---
+  duration_ms: 1.816706
+  type: 'test'
+  ...
+# Subtest: preview digest and confirm=true are mandatory
+ok 49 - preview digest and confirm=true are mandatory
+  ---
+  duration_ms: 1.66408
+  type: 'test'
+  ...
+# Subtest: another client or account cannot use a preview
+ok 50 - another client or account cannot use a preview
+  ---
+  duration_ms: 1.314715
+  type: 'test'
+  ...
+# Subtest: expired and cancelled previews cannot execute
+ok 51 - expired and cancelled previews cannot execute
+  ---
+  duration_ms: 1.945381
+  type: 'test'
+  ...
+# Subtest: removing one duplicate preserves the other occurrence
+ok 52 - removing one duplicate preserves the other occurrence
+  ---
+  duration_ms: 9.212869
+  type: 'test'
+  ...
+# Subtest: stale playlist preview is rejected before mutation
+ok 53 - stale playlist preview is rejected before mutation
+  ---
+  duration_ms: 3.820349
+  type: 'test'
+  ...
+# Subtest: uncertain write retries the same idempotency key rather than duplicating
+ok 54 - uncertain write retries the same idempotency key rather than duplicating
+  ---
+  duration_ms: 3.848796
+  type: 'test'
+  ...
+# Subtest: concurrent commit is rejected while first is in flight
+ok 55 - concurrent commit is rejected while first is in flight
+  ---
+  duration_ms: 2.897666
+  type: 'test'
+  ...
+# Subtest: all eight mutation actions compile and execute against contract fixture
+ok 56 - all eight mutation actions compile and execute against contract fixture
+  ---
+  duration_ms: 33.931466
+  type: 'test'
+  ...
+# Subtest: encrypted state round-trips without exposing plaintext secrets
+ok 57 - encrypted state round-trips without exposing plaintext secrets
+  ---
+  duration_ms: 6.783178
+  type: 'test'
+  ...
+# Subtest: encryption uses fresh nonces for identical state
+ok 58 - encryption uses fresh nonces for identical state
+  ---
+  duration_ms: 2.226012
+  type: 'test'
+  ...
+# Subtest: wrong encryption key fails closed and releases only its own lock
+ok 59 - wrong encryption key fails closed and releases only its own lock
+  ---
+  duration_ms: 1.568242
+  type: 'test'
+  ...
+# Subtest: ciphertext tampering fails authenticated decryption
+ok 60 - ciphertext tampering fails authenticated decryption
+  ---
+  duration_ms: 1.571401
+  type: 'test'
+  ...
+# Subtest: a second writer cannot take a live process lock
+ok 61 - a second writer cannot take a live process lock
+  ---
+  duration_ms: 1.098212
+  type: 'test'
+  ...
+# Subtest: transactions expose copies and reject async mutation
+ok 62 - transactions expose copies and reject async mutation
+  ---
+  duration_ms: 0.320368
+  type: 'test'
+  ...
+# Subtest: failed persistence does not mutate committed in-memory state
+ok 63 - failed persistence does not mutate committed in-memory state
+  ---
+  duration_ms: 0.214136
+  type: 'test'
+  ...
+# Subtest: audit logs only allowlisted metadata and validates its hash chain
+ok 64 - audit logs only allowlisted metadata and validates its hash chain
+  ---
+  duration_ms: 1.912626
+  type: 'test'
+  ...
+# Subtest: audit content tampering is detected on startup
+ok 65 - audit content tampering is detected on startup
+  ---
+  duration_ms: 1.99029
+  type: 'test'
+  ...
+1..65
+# tests 65
+# suites 0
+# pass 65
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 571.64145
+# start of coverage report
+# ---------------------------------------------------------------------
+# file                 | line % | branch % | funcs % | uncovered lines
+# ---------------------------------------------------------------------
+# scripts              |        |          |         | 
+#  tokens.mjs          |  75.68 |    90.32 |   85.71 | 28-36
+# src                  |        |          |         | 
+#  core                |        |          |         | 
+#   audit.mjs          | 100.00 |   100.00 |  100.00 | 
+#   contracts.mjs      | 100.00 |   100.00 |  100.00 | 
+#   http.mjs           |  95.51 |    74.04 |  100.00 | 41-43 82
+#   oauth.mjs          |  99.25 |    74.29 |   95.00 | 100
+#   plans.mjs          | 100.00 |    86.11 |  100.00 | 
+#   schema.mjs         |  66.67 |    95.56 |   77.78 | 37-54
+#   service.mjs        |  87.72 |    65.22 |   66.67 | 8-10 39-42
+#   store.mjs          | 100.00 |    71.43 |   88.89 | 
+#   tidal-client.mjs   | 100.00 |    76.04 |   88.89 | 
+#   upstream-auth.mjs  | 100.00 |    69.01 |  100.00 | 
+#   util.mjs           |  98.46 |    90.00 |   94.74 | 25
+# tests                |        |          |         | 
+#  core                |        |          |         | 
+#   auth.test.mjs      | 100.00 |   100.00 |  100.00 | 
+#   client.test.mjs    | 100.00 |   100.00 |  100.00 | 
+#   contracts.test.mjs | 100.00 |   100.00 |  100.00 | 
+#   design.test.mjs    | 100.00 |   100.00 |  100.00 | 
+#   http.test.mjs      | 100.00 |   100.00 |  100.00 | 
+#   plans.test.mjs     | 100.00 |   100.00 |  100.00 | 
+#   storage.test.mjs   | 100.00 |   100.00 |  100.00 | 
+#  helpers             |        |          |         | 
+#   fixture.mjs        |  96.84 |    82.47 |   96.67 | 51-53
+# ---------------------------------------------------------------------
+# all files            |  96.13 |    83.15 |   96.56 | 
+# ---------------------------------------------------------------------
+# end of coverage report

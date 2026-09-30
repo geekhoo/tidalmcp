@@ -1,0 +1,16 @@
+{
+  "semantic": {
+    "color": {
+      "text": {
+        "$type": "color",
+        "primary": { "$value": "{primitive.color.paper.0}" },
+        "inverse": { "$value": "{primitive.color.ink.900}" }
+      },
+      "surface": {
+        "$type": "color",
+        "canvas": { "$value": "{primitive.color.ink.900}" },
+        "raised": { "$value": "{primitive.color.ink.800}" }
+      }
+    }
+  }
+}

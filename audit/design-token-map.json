@@ -1,0 +1,960 @@
+{
+  "sources": [
+    {
+      "path": "design-source/design/tokens/primitive/base.tokens.json",
+      "sha256": "f17fb17301790e4bf31121e3bbfc44a6663ea83dfd0cba7b9a557394dfbfc82e"
+    },
+    {
+      "path": "design-source/design/tokens/semantic/base.tokens.json",
+      "sha256": "45b54e972312e7d52d7268fef22dc7b2289029f3694c5ba6ccd4686be4011082"
+    },
+    {
+      "path": "design-source/design/tokens/semantic/layout.tokens.json",
+      "sha256": "ff0dceb0f96c0e88cb9df2cabb843cb30a538fa2773cde0252ce4a1e74d66f94"
+    },
+    {
+      "path": "design-source/design/tokens/component/button.tokens.json",
+      "sha256": "71d06eece075da116b7e9aba0a0b58fa92d0a1f759a33cd25c194f22f4bf9e23"
+    }
+  ],
+  "theme": "light",
+  "darkDraft": "Preserved, not activated: the source draft does not define a complete accessible dark palette.",
+  "count": 155,
+  "tokens": [
+    {
+      "key": "component.button.primary.background",
+      "css": "--component-button-primary-background",
+      "original": "{semantic.color.text.primary}",
+      "resolved": "#2a302e"
+    },
+    {
+      "key": "component.button.primary.foreground",
+      "css": "--component-button-primary-foreground",
+      "original": "{semantic.color.text.inverse}",
+      "resolved": "#ffffff"
+    },
+    {
+      "key": "component.button.primary.height",
+      "css": "--component-button-primary-height",
+      "original": "32px",
+      "resolved": "32px"
+    },
+    {
+      "key": "component.button.primary.hoverBackground",
+      "css": "--component-button-primary-hover-background",
+      "original": "{semantic.color.text.primary}",
+      "resolved": "#2a302e"
+    },
+    {
+      "key": "component.button.primary.paddingInline",
+      "css": "--component-button-primary-padding-inline",
+      "original": "14px",
+      "resolved": "14px"
+    },
+    {
+      "key": "component.button.primary.radius",
+      "css": "--component-button-primary-radius",
+      "original": "{semantic.radius.pill}",
+      "resolved": "9999px"
+    },
+    {
+      "key": "component.button.secondary.background",
+      "css": "--component-button-secondary-background",
+      "original": "{semantic.color.surface.raised}",
+      "resolved": "#ffffff"
+    },
+    {
+      "key": "component.button.secondary.border",
+      "css": "--component-button-secondary-border",
+      "original": "{semantic.color.line.strong}",
+      "resolved": "#cfceca"
+    },
+    {
+      "key": "component.button.secondary.foreground",
+      "css": "--component-button-secondary-foreground",
+      "original": "{semantic.color.text.primary}",
+      "resolved": "#2a302e"
+    },
+    {
+      "key": "component.button.secondary.height",
+      "css": "--component-button-secondary-height",
+      "original": "32px",
+      "resolved": "32px"
+    },
+    {
+      "key": "component.button.secondary.paddingInline",
+      "css": "--component-button-secondary-padding-inline",
+      "original": "14px",
+      "resolved": "14px"
+    },
+    {
+      "key": "component.button.secondary.radius",
+      "css": "--component-button-secondary-radius",
+      "original": "{semantic.radius.pill}",
+      "resolved": "9999px"
+    },
+    {
+      "key": "component.button.step.background",
+      "css": "--component-button-step-background",
+      "original": "{semantic.color.surface.raised}",
+      "resolved": "#ffffff"
+    },
+    {
+      "key": "component.button.step.foreground",
+      "css": "--component-button-step-foreground",
+      "original": "{semantic.color.text.tertiary}",
+      "resolved": "#757b78"
+    },
+    {
+      "key": "component.button.step.radius",
+      "css": "--component-button-step-radius",
+      "original": "{semantic.radius.pill}",
+      "resolved": "9999px"
+    },
+    {
+      "key": "component.button.step.size",
+      "css": "--component-button-step-size",
+      "original": "32px",
+      "resolved": "32px"
+    },
+    {
+      "key": "component.card.background",
+      "css": "--component-card-background",
+      "original": "{semantic.color.surface.raised}",
+      "resolved": "#ffffff"
+    },
+    {
+      "key": "component.card.border",
+      "css": "--component-card-border",
+      "original": "{semantic.color.line.strong}",
+      "resolved": "#cfceca"
+    },
+    {
+      "key": "component.card.gap",
+      "css": "--component-card-gap",
+      "original": "{semantic.space.inline.md}",
+      "resolved": "16px"
+    },
+    {
+      "key": "component.card.padding",
+      "css": "--component-card-padding",
+      "original": "{semantic.space.inset.md}",
+      "resolved": "24px"
+    },
+    {
+      "key": "component.card.radius",
+      "css": "--component-card-radius",
+      "original": "{semantic.radius.surface}",
+      "resolved": "8px"
+    },
+    {
+      "key": "component.card.shadow",
+      "css": "--component-card-shadow",
+      "original": "{semantic.shadow.rest}",
+      "resolved": "0 1px 1px rgba(42, 48, 46, 0.04), 0 1px 2px rgba(42, 48, 46, 0.06)"
+    },
+    {
+      "key": "component.field.background",
+      "css": "--component-field-background",
+      "original": "{semantic.color.surface.raised}",
+      "resolved": "#ffffff"
+    },
+    {
+      "key": "component.field.border",
+      "css": "--component-field-border",
+      "original": "{semantic.color.line.strong}",
+      "resolved": "#cfceca"
+    },
+    {
+      "key": "component.field.focusBorder",
+      "css": "--component-field-focus-border",
+      "original": "{semantic.color.line.accent}",
+      "resolved": "#2c5d63"
+    },
+    {
+      "key": "component.field.foreground",
+      "css": "--component-field-foreground",
+      "original": "{semantic.color.text.primary}",
+      "resolved": "#2a302e"
+    },
+    {
+      "key": "component.field.height",
+      "css": "--component-field-height",
+      "original": "32px",
+      "resolved": "32px"
+    },
+    {
+      "key": "component.field.paddingInline",
+      "css": "--component-field-padding-inline",
+      "original": "10px",
+      "resolved": "10px"
+    },
+    {
+      "key": "component.field.radius",
+      "css": "--component-field-radius",
+      "original": "{semantic.radius.field}",
+      "resolved": "4px"
+    },
+    {
+      "key": "primitive.color.ink.500",
+      "css": "--primitive-color-ink-500",
+      "original": "#8c8c8c",
+      "resolved": "#8c8c8c"
+    },
+    {
+      "key": "primitive.color.ink.600",
+      "css": "--primitive-color-ink-600",
+      "original": "#757b78",
+      "resolved": "#757b78"
+    },
+    {
+      "key": "primitive.color.ink.700",
+      "css": "--primitive-color-ink-700",
+      "original": "#5f6563",
+      "resolved": "#5f6563"
+    },
+    {
+      "key": "primitive.color.ink.800",
+      "css": "--primitive-color-ink-800",
+      "original": "#3c4240",
+      "resolved": "#3c4240"
+    },
+    {
+      "key": "primitive.color.ink.900",
+      "css": "--primitive-color-ink-900",
+      "original": "#2a302e",
+      "resolved": "#2a302e"
+    },
+    {
+      "key": "primitive.color.paper.0",
+      "css": "--primitive-color-paper-0",
+      "original": "#ffffff",
+      "resolved": "#ffffff"
+    },
+    {
+      "key": "primitive.color.paper.100",
+      "css": "--primitive-color-paper-100",
+      "original": "#fafaf9",
+      "resolved": "#fafaf9"
+    },
+    {
+      "key": "primitive.color.paper.50",
+      "css": "--primitive-color-paper-50",
+      "original": "#fcfcfc",
+      "resolved": "#fcfcfc"
+    },
+    {
+      "key": "primitive.color.status.danger",
+      "css": "--primitive-color-status-danger",
+      "original": "#a8322c",
+      "resolved": "#a8322c"
+    },
+    {
+      "key": "primitive.color.status.danger-tint",
+      "css": "--primitive-color-status-danger-tint",
+      "original": "#f7e8e6",
+      "resolved": "#f7e8e6"
+    },
+    {
+      "key": "primitive.color.status.info",
+      "css": "--primitive-color-status-info",
+      "original": "#2b6180",
+      "resolved": "#2b6180"
+    },
+    {
+      "key": "primitive.color.status.info-tint",
+      "css": "--primitive-color-status-info-tint",
+      "original": "#e6eef4",
+      "resolved": "#e6eef4"
+    },
+    {
+      "key": "primitive.color.status.success",
+      "css": "--primitive-color-status-success",
+      "original": "#2e7649",
+      "resolved": "#2e7649"
+    },
+    {
+      "key": "primitive.color.status.success-tint",
+      "css": "--primitive-color-status-success-tint",
+      "original": "#e7f1ea",
+      "resolved": "#e7f1ea"
+    },
+    {
+      "key": "primitive.color.status.violet",
+      "css": "--primitive-color-status-violet",
+      "original": "#5b4a86",
+      "resolved": "#5b4a86"
+    },
+    {
+      "key": "primitive.color.status.violet-tint",
+      "css": "--primitive-color-status-violet-tint",
+      "original": "#ece9f4",
+      "resolved": "#ece9f4"
+    },
+    {
+      "key": "primitive.color.status.warning",
+      "css": "--primitive-color-status-warning",
+      "original": "#8a6316",
+      "resolved": "#8a6316"
+    },
+    {
+      "key": "primitive.color.status.warning-tint",
+      "css": "--primitive-color-status-warning-tint",
+      "original": "#f6efdd",
+      "resolved": "#f6efdd"
+    },
+    {
+      "key": "primitive.color.stone.100",
+      "css": "--primitive-color-stone-100",
+      "original": "#eeedea",
+      "resolved": "#eeedea"
+    },
+    {
+      "key": "primitive.color.stone.200",
+      "css": "--primitive-color-stone-200",
+      "original": "#e2e1de",
+      "resolved": "#e2e1de"
+    },
+    {
+      "key": "primitive.color.stone.300",
+      "css": "--primitive-color-stone-300",
+      "original": "#cfceca",
+      "resolved": "#cfceca"
+    },
+    {
+      "key": "primitive.color.stone.400",
+      "css": "--primitive-color-stone-400",
+      "original": "#b9bcb8",
+      "resolved": "#b9bcb8"
+    },
+    {
+      "key": "primitive.color.teal.100",
+      "css": "--primitive-color-teal-100",
+      "original": "#e6eef0",
+      "resolved": "#e6eef0"
+    },
+    {
+      "key": "primitive.color.teal.500",
+      "css": "--primitive-color-teal-500",
+      "original": "#3f7c84",
+      "resolved": "#3f7c84"
+    },
+    {
+      "key": "primitive.color.teal.700",
+      "css": "--primitive-color-teal-700",
+      "original": "#2c5d63",
+      "resolved": "#2c5d63"
+    },
+    {
+      "key": "primitive.color.teal.900",
+      "css": "--primitive-color-teal-900",
+      "original": "#1c3f44",
+      "resolved": "#1c3f44"
+    },
+    {
+      "key": "primitive.font.mono",
+      "css": "--primitive-font-mono",
+      "original": "SF Mono, JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
+      "resolved": "SF Mono, JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+    },
+    {
+      "key": "primitive.font.sans",
+      "css": "--primitive-font-sans",
+      "original": "Satoshi, Inter, system-ui, -apple-system, \"Segoe UI\", sans-serif",
+      "resolved": "Satoshi, Inter, system-ui, -apple-system, \"Segoe UI\", sans-serif"
+    },
+    {
+      "key": "primitive.fontSize.body",
+      "css": "--primitive-font-size-body",
+      "original": "0.8125rem",
+      "resolved": "0.8125rem"
+    },
+    {
+      "key": "primitive.fontSize.code",
+      "css": "--primitive-font-size-code",
+      "original": "0.75rem",
+      "resolved": "0.75rem"
+    },
+    {
+      "key": "primitive.fontSize.lede",
+      "css": "--primitive-font-size-lede",
+      "original": "2.5rem",
+      "resolved": "2.5rem"
+    },
+    {
+      "key": "primitive.fontSize.meta",
+      "css": "--primitive-font-size-meta",
+      "original": "0.6875rem",
+      "resolved": "0.6875rem"
+    },
+    {
+      "key": "primitive.fontSize.metric",
+      "css": "--primitive-font-size-metric",
+      "original": "1.5rem",
+      "resolved": "1.5rem"
+    },
+    {
+      "key": "primitive.fontSize.section",
+      "css": "--primitive-font-size-section",
+      "original": "1.125rem",
+      "resolved": "1.125rem"
+    },
+    {
+      "key": "primitive.fontSize.title",
+      "css": "--primitive-font-size-title",
+      "original": "0.9375rem",
+      "resolved": "0.9375rem"
+    },
+    {
+      "key": "primitive.fontWeight.bold",
+      "css": "--primitive-font-weight-bold",
+      "original": 700,
+      "resolved": 700
+    },
+    {
+      "key": "primitive.fontWeight.medium",
+      "css": "--primitive-font-weight-medium",
+      "original": 500,
+      "resolved": 500
+    },
+    {
+      "key": "primitive.fontWeight.regular",
+      "css": "--primitive-font-weight-regular",
+      "original": 400,
+      "resolved": 400
+    },
+    {
+      "key": "primitive.lineHeight.body",
+      "css": "--primitive-line-height-body",
+      "original": "1.3",
+      "resolved": "1.3"
+    },
+    {
+      "key": "primitive.lineHeight.code",
+      "css": "--primitive-line-height-code",
+      "original": "1.7",
+      "resolved": "1.7"
+    },
+    {
+      "key": "primitive.lineHeight.lede",
+      "css": "--primitive-line-height-lede",
+      "original": "1.3",
+      "resolved": "1.3"
+    },
+    {
+      "key": "primitive.lineHeight.meta",
+      "css": "--primitive-line-height-meta",
+      "original": "1.09",
+      "resolved": "1.09"
+    },
+    {
+      "key": "primitive.lineHeight.metric",
+      "css": "--primitive-line-height-metric",
+      "original": "1.3",
+      "resolved": "1.3"
+    },
+    {
+      "key": "primitive.lineHeight.section",
+      "css": "--primitive-line-height-section",
+      "original": "1.333",
+      "resolved": "1.333"
+    },
+    {
+      "key": "primitive.lineHeight.title",
+      "css": "--primitive-line-height-title",
+      "original": "1.333",
+      "resolved": "1.333"
+    },
+    {
+      "key": "primitive.motion.duration.base",
+      "css": "--primitive-motion-duration-base",
+      "original": "180ms",
+      "resolved": "180ms"
+    },
+    {
+      "key": "primitive.motion.duration.fast",
+      "css": "--primitive-motion-duration-fast",
+      "original": "120ms",
+      "resolved": "120ms"
+    },
+    {
+      "key": "primitive.motion.duration.slow",
+      "css": "--primitive-motion-duration-slow",
+      "original": "260ms",
+      "resolved": "260ms"
+    },
+    {
+      "key": "primitive.motion.easing.standard",
+      "css": "--primitive-motion-easing-standard",
+      "original": [
+        0.2,
+        0,
+        0,
+        1
+      ],
+      "resolved": "cubic-bezier(0.2, 0, 0, 1)"
+    },
+    {
+      "key": "primitive.radius.lg",
+      "css": "--primitive-radius-lg",
+      "original": "12px",
+      "resolved": "12px"
+    },
+    {
+      "key": "primitive.radius.md",
+      "css": "--primitive-radius-md",
+      "original": "8px",
+      "resolved": "8px"
+    },
+    {
+      "key": "primitive.radius.pill",
+      "css": "--primitive-radius-pill",
+      "original": "9999px",
+      "resolved": "9999px"
+    },
+    {
+      "key": "primitive.radius.sm",
+      "css": "--primitive-radius-sm",
+      "original": "4px",
+      "resolved": "4px"
+    },
+    {
+      "key": "primitive.radius.xs",
+      "css": "--primitive-radius-xs",
+      "original": "2px",
+      "resolved": "2px"
+    },
+    {
+      "key": "primitive.shadow.md",
+      "css": "--primitive-shadow-md",
+      "original": "0 2px 4px rgba(42, 48, 46, 0.07), 0 8px 20px -8px rgba(42, 48, 46, 0.16)",
+      "resolved": "0 2px 4px rgba(42, 48, 46, 0.07), 0 8px 20px -8px rgba(42, 48, 46, 0.16)"
+    },
+    {
+      "key": "primitive.shadow.popup",
+      "css": "--primitive-shadow-popup",
+      "original": "0 2px 6px rgba(42, 48, 46, 0.08), 0 16px 32px -12px rgba(42, 48, 46, 0.22)",
+      "resolved": "0 2px 6px rgba(42, 48, 46, 0.08), 0 16px 32px -12px rgba(42, 48, 46, 0.22)"
+    },
+    {
+      "key": "primitive.shadow.sm",
+      "css": "--primitive-shadow-sm",
+      "original": "0 1px 2px rgba(42, 48, 46, 0.06), 0 2px 6px -2px rgba(42, 48, 46, 0.1)",
+      "resolved": "0 1px 2px rgba(42, 48, 46, 0.06), 0 2px 6px -2px rgba(42, 48, 46, 0.1)"
+    },
+    {
+      "key": "primitive.shadow.xs",
+      "css": "--primitive-shadow-xs",
+      "original": "0 1px 1px rgba(42, 48, 46, 0.04), 0 1px 2px rgba(42, 48, 46, 0.06)",
+      "resolved": "0 1px 1px rgba(42, 48, 46, 0.04), 0 1px 2px rgba(42, 48, 46, 0.06)"
+    },
+    {
+      "key": "primitive.space.1",
+      "css": "--primitive-space-1",
+      "original": "2px",
+      "resolved": "2px"
+    },
+    {
+      "key": "primitive.space.10",
+      "css": "--primitive-space-10",
+      "original": "56px",
+      "resolved": "56px"
+    },
+    {
+      "key": "primitive.space.11",
+      "css": "--primitive-space-11",
+      "original": "72px",
+      "resolved": "72px"
+    },
+    {
+      "key": "primitive.space.2",
+      "css": "--primitive-space-2",
+      "original": "4px",
+      "resolved": "4px"
+    },
+    {
+      "key": "primitive.space.3",
+      "css": "--primitive-space-3",
+      "original": "8px",
+      "resolved": "8px"
+    },
+    {
+      "key": "primitive.space.4",
+      "css": "--primitive-space-4",
+      "original": "12px",
+      "resolved": "12px"
+    },
+    {
+      "key": "primitive.space.5",
+      "css": "--primitive-space-5",
+      "original": "16px",
+      "resolved": "16px"
+    },
+    {
+      "key": "primitive.space.6",
+      "css": "--primitive-space-6",
+      "original": "20px",
+      "resolved": "20px"
+    },
+    {
+      "key": "primitive.space.7",
+      "css": "--primitive-space-7",
+      "original": "24px",
+      "resolved": "24px"
+    },
+    {
+      "key": "primitive.space.8",
+      "css": "--primitive-space-8",
+      "original": "32px",
+      "resolved": "32px"
+    },
+    {
+      "key": "primitive.space.9",
+      "css": "--primitive-space-9",
+      "original": "40px",
+      "resolved": "40px"
+    },
+    {
+      "key": "primitive.tracking.snug",
+      "css": "--primitive-tracking-snug",
+      "original": "-0.02em",
+      "resolved": "-0.02em"
+    },
+    {
+      "key": "primitive.tracking.tight",
+      "css": "--primitive-tracking-tight",
+      "original": "-0.03em",
+      "resolved": "-0.03em"
+    },
+    {
+      "key": "primitive.tracking.wide",
+      "css": "--primitive-tracking-wide",
+      "original": "0.02em",
+      "resolved": "0.02em"
+    },
+    {
+      "key": "semantic.color.interaction.active",
+      "css": "--semantic-color-interaction-active",
+      "original": "rgba(42, 48, 46, 0.08)",
+      "resolved": "rgba(42, 48, 46, 0.08)"
+    },
+    {
+      "key": "semantic.color.interaction.focus",
+      "css": "--semantic-color-interaction-focus",
+      "original": "rgba(44, 93, 99, 0.22)",
+      "resolved": "rgba(44, 93, 99, 0.22)"
+    },
+    {
+      "key": "semantic.color.interaction.hover",
+      "css": "--semantic-color-interaction-hover",
+      "original": "rgba(42, 48, 46, 0.045)",
+      "resolved": "rgba(42, 48, 46, 0.045)"
+    },
+    {
+      "key": "semantic.color.interaction.selected",
+      "css": "--semantic-color-interaction-selected",
+      "original": "rgba(44, 93, 99, 0.1)",
+      "resolved": "rgba(44, 93, 99, 0.1)"
+    },
+    {
+      "key": "semantic.color.line.accent",
+      "css": "--semantic-color-line-accent",
+      "original": "{primitive.color.teal.700}",
+      "resolved": "#2c5d63"
+    },
+    {
+      "key": "semantic.color.line.rule",
+      "css": "--semantic-color-line-rule",
+      "original": "{primitive.color.stone.400}",
+      "resolved": "#b9bcb8"
+    },
+    {
+      "key": "semantic.color.line.strong",
+      "css": "--semantic-color-line-strong",
+      "original": "{primitive.color.stone.300}",
+      "resolved": "#cfceca"
+    },
+    {
+      "key": "semantic.color.line.subtle",
+      "css": "--semantic-color-line-subtle",
+      "original": "{primitive.color.stone.200}",
+      "resolved": "#e2e1de"
+    },
+    {
+      "key": "semantic.color.status.danger",
+      "css": "--semantic-color-status-danger",
+      "original": "{primitive.color.status.danger}",
+      "resolved": "#a8322c"
+    },
+    {
+      "key": "semantic.color.status.dangerTint",
+      "css": "--semantic-color-status-danger-tint",
+      "original": "{primitive.color.status.danger-tint}",
+      "resolved": "#f7e8e6"
+    },
+    {
+      "key": "semantic.color.status.success",
+      "css": "--semantic-color-status-success",
+      "original": "{primitive.color.status.success}",
+      "resolved": "#2e7649"
+    },
+    {
+      "key": "semantic.color.status.successTint",
+      "css": "--semantic-color-status-success-tint",
+      "original": "{primitive.color.status.success-tint}",
+      "resolved": "#e7f1ea"
+    },
+    {
+      "key": "semantic.color.status.warning",
+      "css": "--semantic-color-status-warning",
+      "original": "{primitive.color.status.warning}",
+      "resolved": "#8a6316"
+    },
+    {
+      "key": "semantic.color.status.warningTint",
+      "css": "--semantic-color-status-warning-tint",
+      "original": "{primitive.color.status.warning-tint}",
+      "resolved": "#f6efdd"
+    },
+    {
+      "key": "semantic.color.surface.canvas",
+      "css": "--semantic-color-surface-canvas",
+      "original": "{primitive.color.paper.50}",
+      "resolved": "#fcfcfc"
+    },
+    {
+      "key": "semantic.color.surface.raised",
+      "css": "--semantic-color-surface-raised",
+      "original": "{primitive.color.paper.0}",
+      "resolved": "#ffffff"
+    },
+    {
+      "key": "semantic.color.surface.sunken",
+      "css": "--semantic-color-surface-sunken",
+      "original": "{primitive.color.stone.100}",
+      "resolved": "#eeedea"
+    },
+    {
+      "key": "semantic.color.surface.window",
+      "css": "--semantic-color-surface-window",
+      "original": "{primitive.color.paper.100}",
+      "resolved": "#fafaf9"
+    },
+    {
+      "key": "semantic.color.text.accent",
+      "css": "--semantic-color-text-accent",
+      "original": "{primitive.color.teal.700}",
+      "resolved": "#2c5d63"
+    },
+    {
+      "key": "semantic.color.text.disabled",
+      "css": "--semantic-color-text-disabled",
+      "original": "{primitive.color.stone.400}",
+      "resolved": "#b9bcb8"
+    },
+    {
+      "key": "semantic.color.text.inverse",
+      "css": "--semantic-color-text-inverse",
+      "original": "{primitive.color.paper.0}",
+      "resolved": "#ffffff"
+    },
+    {
+      "key": "semantic.color.text.primary",
+      "css": "--semantic-color-text-primary",
+      "original": "{primitive.color.ink.900}",
+      "resolved": "#2a302e"
+    },
+    {
+      "key": "semantic.color.text.secondary",
+      "css": "--semantic-color-text-secondary",
+      "original": "{primitive.color.ink.700}",
+      "resolved": "#5f6563"
+    },
+    {
+      "key": "semantic.color.text.tertiary",
+      "css": "--semantic-color-text-tertiary",
+      "original": "{primitive.color.ink.600}",
+      "resolved": "#757b78"
+    },
+    {
+      "key": "semantic.color.verdict.false",
+      "css": "--semantic-color-verdict-false",
+      "original": "#99544d",
+      "resolved": "#99544d"
+    },
+    {
+      "key": "semantic.color.verdict.falseTint",
+      "css": "--semantic-color-verdict-false-tint",
+      "original": "#f4eae8",
+      "resolved": "#f4eae8"
+    },
+    {
+      "key": "semantic.color.verdict.true",
+      "css": "--semantic-color-verdict-true",
+      "original": "#477259",
+      "resolved": "#477259"
+    },
+    {
+      "key": "semantic.color.verdict.trueTint",
+      "css": "--semantic-color-verdict-true-tint",
+      "original": "#eaf0eb",
+      "resolved": "#eaf0eb"
+    },
+    {
+      "key": "semantic.layout.chromeMeasure",
+      "css": "--semantic-layout-chrome-measure",
+      "original": "880px",
+      "resolved": "880px"
+    },
+    {
+      "key": "semantic.layout.contentMeasure",
+      "css": "--semantic-layout-content-measure",
+      "original": "720px",
+      "resolved": "720px"
+    },
+    {
+      "key": "semantic.layout.controlHeight",
+      "css": "--semantic-layout-control-height",
+      "original": "32px",
+      "resolved": "32px"
+    },
+    {
+      "key": "semantic.layout.controlHeightCompact",
+      "css": "--semantic-layout-control-height-compact",
+      "original": "24px",
+      "resolved": "24px"
+    },
+    {
+      "key": "semantic.layout.controlHeightSmall",
+      "css": "--semantic-layout-control-height-small",
+      "original": "28px",
+      "resolved": "28px"
+    },
+    {
+      "key": "semantic.layout.gridMinColumn",
+      "css": "--semantic-layout-grid-min-column",
+      "original": "320px",
+      "resolved": "320px"
+    },
+    {
+      "key": "semantic.layout.topbarHeight",
+      "css": "--semantic-layout-topbar-height",
+      "original": "48px",
+      "resolved": "48px"
+    },
+    {
+      "key": "semantic.radius.field",
+      "css": "--semantic-radius-field",
+      "original": "{primitive.radius.sm}",
+      "resolved": "4px"
+    },
+    {
+      "key": "semantic.radius.pill",
+      "css": "--semantic-radius-pill",
+      "original": "{primitive.radius.pill}",
+      "resolved": "9999px"
+    },
+    {
+      "key": "semantic.radius.surface",
+      "css": "--semantic-radius-surface",
+      "original": "{primitive.radius.md}",
+      "resolved": "8px"
+    },
+    {
+      "key": "semantic.shadow.hover",
+      "css": "--semantic-shadow-hover",
+      "original": "{primitive.shadow.sm}",
+      "resolved": "0 1px 2px rgba(42, 48, 46, 0.06), 0 2px 6px -2px rgba(42, 48, 46, 0.1)"
+    },
+    {
+      "key": "semantic.shadow.popup",
+      "css": "--semantic-shadow-popup",
+      "original": "{primitive.shadow.popup}",
+      "resolved": "0 2px 6px rgba(42, 48, 46, 0.08), 0 16px 32px -12px rgba(42, 48, 46, 0.22)"
+    },
+    {
+      "key": "semantic.shadow.raised",
+      "css": "--semantic-shadow-raised",
+      "original": "{primitive.shadow.md}",
+      "resolved": "0 2px 4px rgba(42, 48, 46, 0.07), 0 8px 20px -8px rgba(42, 48, 46, 0.16)"
+    },
+    {
+      "key": "semantic.shadow.rest",
+      "css": "--semantic-shadow-rest",
+      "original": "{primitive.shadow.xs}",
+      "resolved": "0 1px 1px rgba(42, 48, 46, 0.04), 0 1px 2px rgba(42, 48, 46, 0.06)"
+    },
+    {
+      "key": "semantic.space.inline.md",
+      "css": "--semantic-space-inline-md",
+      "original": "{primitive.space.5}",
+      "resolved": "16px"
+    },
+    {
+      "key": "semantic.space.inline.sm",
+      "css": "--semantic-space-inline-sm",
+      "original": "{primitive.space.3}",
+      "resolved": "8px"
+    },
+    {
+      "key": "semantic.space.inline.xs",
+      "css": "--semantic-space-inline-xs",
+      "original": "{primitive.space.2}",
+      "resolved": "4px"
+    },
+    {
+      "key": "semantic.space.inset.lg",
+      "css": "--semantic-space-inset-lg",
+      "original": "{primitive.space.9}",
+      "resolved": "40px"
+    },
+    {
+      "key": "semantic.space.inset.md",
+      "css": "--semantic-space-inset-md",
+      "original": "{primitive.space.7}",
+      "resolved": "24px"
+    },
+    {
+      "key": "semantic.space.inset.sm",
+      "css": "--semantic-space-inset-sm",
+      "original": "{primitive.space.4}",
+      "resolved": "12px"
+    },
+    {
+      "key": "semantic.space.inset.xs",
+      "css": "--semantic-space-inset-xs",
+      "original": "{primitive.space.2}",
+      "resolved": "4px"
+    },
+    {
+      "key": "semantic.space.stack.lg",
+      "css": "--semantic-space-stack-lg",
+      "original": "{primitive.space.10}",
+      "resolved": "56px"
+    },
+    {
+      "key": "semantic.space.stack.md",
+      "css": "--semantic-space-stack-md",
+      "original": "{primitive.space.5}",
+      "resolved": "16px"
+    },
+    {
+      "key": "semantic.space.stack.sm",
+      "css": "--semantic-space-stack-sm",
+      "original": "{primitive.space.4}",
+      "resolved": "12px"
+    },
+    {
+      "key": "semantic.space.stack.xl",
+      "css": "--semantic-space-stack-xl",
+      "original": "{primitive.space.11}",
+      "resolved": "72px"
+    },
+    {
+      "key": "semantic.space.stack.xs",
+      "css": "--semantic-space-stack-xs",
+      "original": "{primitive.space.2}",
+      "resolved": "4px"
+    }
+  ]
+}

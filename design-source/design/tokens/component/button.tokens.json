@@ -1,0 +1,45 @@
+{
+  "component": {
+    "button": {
+      "primary": {
+        "background": { "$type": "color", "$value": "{semantic.color.text.primary}" },
+        "foreground": { "$type": "color", "$value": "{semantic.color.text.inverse}" },
+        "hoverBackground": { "$type": "color", "$value": "{semantic.color.text.primary}" },
+        "radius": { "$type": "dimension", "$value": "{semantic.radius.pill}" },
+        "height": { "$type": "dimension", "$value": "32px" },
+        "paddingInline": { "$type": "dimension", "$value": "14px" }
+      },
+      "secondary": {
+        "background": { "$type": "color", "$value": "{semantic.color.surface.raised}" },
+        "foreground": { "$type": "color", "$value": "{semantic.color.text.primary}" },
+        "border": { "$type": "color", "$value": "{semantic.color.line.strong}" },
+        "radius": { "$type": "dimension", "$value": "{semantic.radius.pill}" },
+        "height": { "$type": "dimension", "$value": "32px" },
+        "paddingInline": { "$type": "dimension", "$value": "14px" }
+      },
+      "step": {
+        "background": { "$type": "color", "$value": "{semantic.color.surface.raised}" },
+        "foreground": { "$type": "color", "$value": "{semantic.color.text.tertiary}" },
+        "radius": { "$type": "dimension", "$value": "{semantic.radius.pill}" },
+        "size": { "$type": "dimension", "$value": "32px" }
+      }
+    },
+    "field": {
+      "background": { "$type": "color", "$value": "{semantic.color.surface.raised}" },
+      "foreground": { "$type": "color", "$value": "{semantic.color.text.primary}" },
+      "border": { "$type": "color", "$value": "{semantic.color.line.strong}" },
+      "focusBorder": { "$type": "color", "$value": "{semantic.color.line.accent}" },
+      "radius": { "$type": "dimension", "$value": "{semantic.radius.field}" },
+      "height": { "$type": "dimension", "$value": "32px" },
+      "paddingInline": { "$type": "dimension", "$value": "10px" }
+    },
+    "card": {
+      "background": { "$type": "color", "$value": "{semantic.color.surface.raised}" },
+      "border": { "$type": "color", "$value": "{semantic.color.line.strong}" },
+      "radius": { "$type": "dimension", "$value": "{semantic.radius.surface}" },
+      "padding": { "$type": "dimension", "$value": "{semantic.space.inset.md}" },
+      "gap": { "$type": "dimension", "$value": "{semantic.space.inline.md}" },
+      "shadow": { "$type": "shadow", "$value": "{semantic.shadow.rest}" }
+    }
+  }
+}
