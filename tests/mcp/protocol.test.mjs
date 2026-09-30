@@ -1,0 +1,10 @@
+// Requires the real installed official SDK. A missing package is a failure, never a skip/pass.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { fileURLToPath } from 'node:url';
+import { Client } from '@modelcontextprotocol/client';
+import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
+async function connect(t){const transport=new StdioClientTransport({command:process.execPath,args:[fileURLToPath(new URL('./server-fixture.mjs',import.meta.url))],stderr:'pipe'});const client=new Client({name:'tidal-protocol-tests',version:'1.0.0'});await client.connect(transport);t.after(()=>client.close());return client;}
+test('official SDK negotiates stdio and lists 12 validated tools',async t=>{const c=await connect(t),{tools}=await c.listTools();assert.equal(tools.length,12);const search=tools.find(x=>x.name==='tidal_search');assert.equal(search.inputSchema.type,'object');assert.ok(search._meta.ui.resourceUri.startsWith('ui://tidal/'));assert.equal(search._meta.securitySchemes[0].type,'oauth2');assert.equal(search.annotations.readOnlyHint,true);const r=await c.callTool({name:'tidal_search',arguments:{query:'night',kind:'tracks'}});assert.equal(r.isError,undefined);assert.equal(r.structuredContent.ok,true);assert.ok(r.structuredContent.data.items.length);});
+test('official SDK returns MCP Apps HTML with narrow resource policy',async t=>{const c=await connect(t),list=await c.listResources(),resource=list.resources.find(r=>r.uri.startsWith('ui://'));const r=await c.readResource({uri:resource.uri});assert.equal(r.contents[0].mimeType,'text/html;profile=mcp-app');assert.deepEqual(r.contents[0]._meta.ui.csp.connectDomains,[]);assert.ok(r.contents[0].text.includes('Protocol fixture'));});
+test('official SDK enforces strict input and exposes mutation annotations',async t=>{const c=await connect(t),{tools}=await c.listTools();assert.equal(tools.find(t=>t.name==='tidal_commit_change').annotations.destructiveHint,true);const bad=await c.callTool({name:'tidal_search',arguments:{query:'night',kind:'tracks',arbitraryUrl:'https://evil.example'}});assert.equal(bad.isError,true);});
