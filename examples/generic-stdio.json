@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "tidal": {
+      "command": "node",
+      "args": [
+        "--env-file=/absolute/path/tidal-mcp-app/.env",
+        "/absolute/path/tidal-mcp-app/src/main.mjs",
+        "--stdio"
+      ]
+    }
+  }
+}

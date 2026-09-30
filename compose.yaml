@@ -1,0 +1,22 @@
+services:
+  tidal-mcp:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      LISTEN_HOST: 0.0.0.0
+      PORT: 3000
+      DATA_DIR: /data
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - tidal-state:/data
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+volumes:
+  tidal-state:

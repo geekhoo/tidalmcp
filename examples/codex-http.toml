@@ -1,0 +1,4 @@
+# Register the actual client callback URI in OAUTH_REDIRECT_ALLOWLIST.
+[mcp_servers.tidal]
+url = "https://music.example.com/mcp"
+tool_timeout_sec = 120

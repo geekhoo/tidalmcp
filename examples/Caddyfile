@@ -1,0 +1,7 @@
+# Replace this hostname and PUBLIC_ORIGIN consistently.
+# Keep the backend bound to loopback; do not log OAuth query strings.
+music.example.com {
+    reverse_proxy 127.0.0.1:3000 {
+        header_up Host music.example.com
+    }
+}
