@@ -8,7 +8,7 @@ export class OAuthBroker {
   constructor({store,auth,config,now=Date.now}) {Object.assign(this,{store,auth,config,now});}
   metadata() {return {issuer:this.config.origin,authorization_endpoint:this.config.origin+'/authorize',token_endpoint:this.config.origin+'/token',registration_endpoint:this.config.origin+'/register',revocation_endpoint:this.config.origin+'/revoke',response_types_supported:['code'],grant_types_supported:['authorization_code','refresh_token'],token_endpoint_auth_methods_supported:['none'],revocation_endpoint_auth_methods_supported:['none'],code_challenge_methods_supported:['S256'],scopes_supported:this.config.enableWrites?['tidal:read','tidal:write']:['tidal:read']};}
   resourceMetadata() {return {resource:this.config.resource,authorization_servers:[this.config.origin],scopes_supported:this.metadata().scopes_supported,bearer_methods_supported:['header'],resource_name:'TIDAL MCP App'};}
-  register(input) {
+  async register(input) {
     const redirects=input?.redirect_uris;
     if(!Array.isArray(redirects)||!redirects.length||redirects.length>5||new Set(redirects).size!==redirects.length)fail('invalid_client_metadata','Provide one to five unique redirect URIs.');
     for(const uri of redirects) {
@@ -20,11 +20,11 @@ export class OAuthBroker {
     if(input.grant_types && (!Array.isArray(input.grant_types)||input.grant_types.some(v=>!['authorization_code','refresh_token'].includes(v))))fail('invalid_client_metadata','Unsupported grant type.');
     const name=typeof input.client_name==='string'?input.client_name.slice(0,100):'MCP client';
     const client={client_id:opaque(24),client_name:name,redirect_uris:redirects,token_endpoint_auth_method:'none',grant_types:['authorization_code','refresh_token'],response_types:['code'],client_id_issued_at:Math.floor(this.now()/1000)};
-    this.store.tx(s=>{if(Object.keys(s.clients).length>=128)fail('temporarily_unavailable','Registration capacity reached; contact the server operator.',503);s.clients[client.client_id]=client;});
+    await this.store.tx(s=>{if(Object.keys(s.clients).length>=128)fail('temporarily_unavailable','Registration capacity reached; contact the server operator.',503);s.clients[client.client_id]=client;});
     return client;
   }
-  begin(params) {
-    this.prune();
+  async begin(params) {
+    await this.prune();
     const clientId=required(params,'client_id'),redirectUri=required(params,'redirect_uri');
     const client=this.store.read(s=>s.clients[clientId]);
     if(!client)fail('invalid_client','Unknown OAuth client.');
@@ -38,18 +38,18 @@ export class OAuthBroker {
     if(!scopes.includes('tidal:read')||scopes.some(s=>!this.metadata().scopes_supported.includes(s)))fail('invalid_scope','Unsupported scope; tidal:read is required and writes need operator opt-in.');
     const consentId=opaque(),csrf=opaque(),cookie=opaque();
     const pending={kind:'consent',clientId,clientName:client.client_name,redirectUri,resource:params.resource,scopes,codeChallenge,state:params.state||'',cookieHash:sha256(cookie),csrfHash:sha256(csrf),expiresAt:this.now()+TEN_MIN};
-    this.store.tx(s=>{if(Object.keys(s.pending).length>=512)fail('temporarily_unavailable','Too many pending authorizations.',503);s.pending[sha256(consentId)]=pending;});
+    await this.store.tx(s=>{if(Object.keys(s.pending).length>=512)fail('temporarily_unavailable','Too many pending authorizations.',503);s.pending[sha256(consentId)]=pending;});
     return {consentId,csrf,cookie,clientName:pending.clientName,scopes,redirectUri};
   }
-  consent(consentId,csrf,cookie,approved) {
+  async consent(consentId,csrf,cookie,approved) {
     const key=sha256(consentId||'');
     const pending=this.store.read(s=>s.pending[key]);
     if(!pending||pending.kind!=='consent'||pending.expiresAt<=this.now()||!equalSecret(pending.cookieHash,sha256(cookie||''))||!equalSecret(pending.csrfHash,sha256(csrf||'')))fail('invalid_request','Consent session expired or browser/CSRF binding failed.');
-    this.store.tx(s=>{delete s.pending[key];});
+    await this.store.tx(s=>{delete s.pending[key];});
     if(!approved)return {url:this.clientRedirect(pending,{error:'access_denied'})};
     const state=opaque(),scopes=[...READ_SCOPES,...(pending.scopes.includes('tidal:write')?WRITE_SCOPES:[])];
     const login=this.auth.loginUrl(state,scopes);
-    this.store.tx(s=>{s.pending[sha256(state)]={...pending,kind:'upstream',verifier:login.verifier,upstreamScopes:scopes,expiresAt:this.now()+TEN_MIN};});
+    await this.store.tx(s=>{s.pending[sha256(state)]={...pending,kind:'upstream',verifier:login.verifier,upstreamScopes:scopes,expiresAt:this.now()+TEN_MIN};});
     return {url:login.url};
   }
   clientRedirect(pending,values) {
@@ -59,17 +59,17 @@ export class OAuthBroker {
     const state=required(params,'state'),key=sha256(state),pending=this.store.read(s=>s.pending[key]);
     if(!pending||pending.kind!=='upstream'||pending.expiresAt<=this.now()||!equalSecret(pending.cookieHash,sha256(cookie||'')))fail('invalid_request','TIDAL callback is stale, was replayed, or came from another browser.');
     // Consume before network I/O. A failed exchange requires a fresh authorization, not replay.
-    this.store.tx(s=>{delete s.pending[key];});
+    await this.store.tx(s=>{delete s.pending[key];});
     if(params.error)return this.clientRedirect(pending,{error:'access_denied'});
     const code=required(params,'code',8192);
     const token=await this.auth.exchange(code,pending.verifier,this.config.callback,pending.upstreamScopes);
     const identity=await this.auth.identify(token);
-    const grantId=this.auth.saveGrant(token,identity),downstreamCode=opaque();
-    this.store.tx(s=>{s.codes[sha256(downstreamCode)]={clientId:pending.clientId,redirectUri:pending.redirectUri,resource:pending.resource,scopes:pending.scopes,codeChallenge:pending.codeChallenge,grantId,expiresAt:this.now()+FIVE_MIN};});
+    const grantId=await this.auth.saveGrant(token,identity),downstreamCode=opaque();
+    await this.store.tx(s=>{s.codes[sha256(downstreamCode)]={clientId:pending.clientId,redirectUri:pending.redirectUri,resource:pending.resource,scopes:pending.scopes,codeChallenge:pending.codeChallenge,grantId,expiresAt:this.now()+FIVE_MIN};});
     return this.clientRedirect(pending,{code:downstreamCode});
   }
-  token(params) {
-    this.prune();
+  async token(params) {
+    await this.prune();
     const clientId=required(params,'client_id');
     if(!this.store.read(s=>s.clients[clientId]))fail('invalid_client','Unknown client.',401);
     if(params.resource!==this.config.resource)fail('invalid_target','Incorrect or missing resource indicator.');
@@ -80,7 +80,7 @@ export class OAuthBroker {
       const code=this.store.read(s=>s.codes[key]);
       if(!code||code.expiresAt<=this.now()||code.clientId!==clientId||code.resource!==params.resource||code.redirectUri!==params.redirect_uri||!equalSecret(code.codeChallenge,challenge(verifier)))fail('invalid_grant','Authorization code is invalid, expired or incorrectly bound.');
       const grant=this.auth.grant(code.grantId);if(!grant||grant.disabled)fail('invalid_grant','Account grant is no longer available.');
-      return this.store.tx(s=>{
+      return await this.store.tx(s=>{
         delete s.codes[key];
         const familyId=opaque();s.families[familyId]={grantId:code.grantId,clientId,resource:code.resource,scopes:code.scopes,expiresAt:this.now()+FAMILY_TTL,revoked:false};
         return this.issue(s,familyId);
@@ -92,10 +92,10 @@ export class OAuthBroker {
       if(!refresh)fail('invalid_grant','Refresh token is invalid or expired.');
       const family=this.store.read(s=>s.families[refresh.familyId]);
       if(!family||family.clientId!==clientId||family.resource!==params.resource||family.expiresAt<=this.now()||family.revoked)fail('invalid_grant','Refresh grant is no longer valid.');
-      if(refresh.used) {this.store.tx(s=>{s.families[refresh.familyId].revoked=true;});fail('invalid_grant','Refresh token replay detected; this client grant was revoked. Reconnect.');}
+      if(refresh.used) {await this.store.tx(s=>{s.families[refresh.familyId].revoked=true;});fail('invalid_grant','Refresh token replay detected; this client grant was revoked. Reconnect.');}
       if(params.scope && (!params.scope.split(/\s+/).includes('tidal:read') || params.scope.split(/\s+/).some(v=>!family.scopes.includes(v))))fail('invalid_scope','Refresh cannot expand granted permissions.');
       const grant=this.auth.grant(family.grantId);if(!grant||grant.disabled)fail('invalid_grant','TIDAL account was disconnected.');
-      return this.store.tx(s=>{s.refresh[key].used=true;return this.issue(s,refresh.familyId,params.scope?.split(/\s+/).filter(Boolean));});
+      return await this.store.tx(s=>{s.refresh[key].used=true;return this.issue(s,refresh.familyId,params.scope?.split(/\s+/).filter(Boolean));});
     }
     fail('unsupported_grant_type','Only authorization_code and refresh_token grants are supported.');
   }
@@ -117,13 +117,13 @@ export class OAuthBroker {
     if(!access.scopes.includes('tidal:read'))fail('insufficient_scope','tidal:read is required.',403);
     return {grantId:access.grantId,subject:grant.subject,clientId:access.clientId,scopes:access.scopes,expiresAt:Math.floor(access.expiresAt/1000)};
   }
-  revoke(params) {
+  async revoke(params) {
     const clientId=required(params,'client_id'),key=sha256(required(params,'token',8192));
-    this.store.tx(s=>{const record=s.access[key]||s.refresh[key];const family=record&&s.families[record.familyId];if(family&&family.clientId===clientId)family.revoked=true;});
+    await this.store.tx(s=>{const record=s.access[key]||s.refresh[key];const family=record&&s.families[record.familyId];if(family&&family.clientId===clientId)family.revoked=true;});
   }
-  prune() {
+  async prune() {
     const now=this.now();
-    this.store.tx(s=>{
+    await this.store.tx(s=>{
       for(const table of ['pending','codes','access','families'])for(const[k,v]of Object.entries(s[table]))if(v.expiresAt<=now)delete s[table][k];
       for(const[k,v]of Object.entries(s.refresh))if(!s.families[v.familyId])delete s.refresh[k];
       for(const[k,v]of Object.entries(s.plans))if((v.retryUntil||v.expiresAt)+86400000<now)delete s.plans[k];

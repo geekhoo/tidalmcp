@@ -6,7 +6,7 @@ import { publicError } from './core/util.mjs';
 let runtime;
 try {
   const [{createMcpServer},{sdkSend}]=await Promise.all([import('./mcp/server.mjs'),import('./adapters/tidal-sdk.mjs')]);
-  runtime=makeRuntime({send:sdkSend});
+  runtime=await makeRuntime({send:sdkSend});
   const widgetHtml=await readFile(new URL('../dist/widget.html',import.meta.url),'utf8');
   if(process.argv.includes('--stdio')) {
     const {StdioServerTransport}=await import('@modelcontextprotocol/server/stdio');
@@ -26,7 +26,7 @@ try {
     const server=httpServer({...runtime,mcpHandler});
     await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(runtime.config.port,runtime.config.host,resolve);});
     console.error(`TIDAL MCP listening at ${runtime.config.resource}. No credentials are logged.`);
-    const maintenance=setInterval(()=>{try{runtime.broker.prune();}catch{console.error('State maintenance failed; investigate storage health.');}},60000);maintenance.unref();
+    const maintenance=setInterval(async()=>{try{await runtime.broker.prune();}catch{console.error('State maintenance failed; investigate storage health.');}},60000);maintenance.unref();
     for(const signal of ['SIGINT','SIGTERM'])process.once(signal,()=>{clearInterval(maintenance);server.close(()=>{runtime.close();process.exit(0);});setTimeout(()=>process.exit(1),10000).unref();});
   }
 }catch(error){

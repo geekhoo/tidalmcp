@@ -27,7 +27,7 @@ export class Plans {
     const planId=opaque(24),expiresAt=this.now()+300000;
     const exact={action:change.action,...request,...(guard?{guard}:{})};
     const digest=sha256(canonical(exact));
-    this.store.tx(s=>{
+    await this.store.tx(s=>{
       const own=Object.values(s.plans).filter(p=>p.grantId===principal.grantId&&p.expiresAt>this.now());
       if(own.length>=100)fail('PLAN_LIMIT','Too many active previews. Cancel unused previews or wait for expiry.',429);
       s.plans[planId]={...exact,planId,digest,grantId:principal.grantId,clientId:principal.clientId,expiresAt,createdAt:this.now(),idempotencyKey:opaque(24),status:'prepared'};
@@ -48,7 +48,7 @@ export class Plans {
     if(plan.status==='unknown' && plan.retryUntil<=this.now())fail('WRITE_OUTCOME_UNKNOWN','Retry window expired. Inspect TIDAL before preparing any replacement operation.',409);
     if(plan.status==='prepared' && plan.expiresAt<=this.now())fail('PLAN_EXPIRED','Preview expired. Prepare and review it again.',409);
     const wasUnknown=plan.status==='unknown';
-    this.store.tx(s=>{s.plans[id].status='executing';s.plans[id].retryUntil=plan.retryUntil||this.now()+55*60000;});
+    await this.store.tx(s=>{s.plans[id].status='executing';s.plans[id].retryUntil=plan.retryUntil||this.now()+55*60000;});
     let writeStarted=false;
     try {
       // Do not reject a retry merely because the original (uncertain) write changed the target.
@@ -59,18 +59,18 @@ export class Plans {
       writeStarted=true;
       const result=await this.client.request({principal,path:plan.path,method:plan.method,body:plan.body,scope:plan.scope,idempotencyKey:plan.idempotencyKey});
       const output={applied:true,action:plan.action,status:result.status,document:result.document,partial:Array.isArray(result.document?.meta?.skippedItems)&&result.document.meta.skippedItems.length>0,warning:'Check skippedItems and returned relationship metadata; a successful HTTP status need not mean every requested item was added.'};
-      this.store.tx(s=>{if(!s.plans[id])return;s.plans[id].status='completed';s.plans[id].result=output;});
+      await this.store.tx(s=>{if(!s.plans[id])return;s.plans[id].status='completed';s.plans[id].result=output;});
       return output;
     }catch(error){
       // Once a write starts, network, parser, persistence or server failures can be ambiguous.
       const uncertain=writeStarted && (!error.status || error.status>=500 || ['WRITE_OUTCOME_UNKNOWN','TIDAL_CONFLICT','TIDAL_RATE_LIMITED'].includes(error.code));
-      this.store.tx(s=>{if(s.plans[id])s.plans[id].status=uncertain?'unknown':'failed';});
+      await this.store.tx(s=>{if(s.plans[id])s.plans[id].status=uncertain?'unknown':'failed';});
       throw error;
     }
   }
-  cancel(principal,id) {
+  async cancel(principal,id) {
     const plan=this.own(principal,id);
     if(['executing','completed','unknown'].includes(plan.status))fail('CANNOT_CANCEL','Cannot cancel an executing, completed or uncertain write; inspect its outcome.',409);
-    this.store.tx(s=>{s.plans[id].status='cancelled';});return {cancelled:true,planId:id};
+    await this.store.tx(s=>{s.plans[id].status='cancelled';});return {cancelled:true,planId:id};
   }
 }

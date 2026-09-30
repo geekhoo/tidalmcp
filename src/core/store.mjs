@@ -8,7 +8,7 @@ export function emptyState() {
 export class MemoryStore {
   constructor(data = emptyState()) { this.data = clone(data); }
   read(fn) { return clone(fn(this.data)); }
-  tx(fn) {
+  async tx(fn) {
     const copy = clone(this.data); const result = fn(copy);
     if (result instanceof Promise) throw new Error('Store transactions must be synchronous.');
     this.persist(copy); this.data = copy; return clone(result);

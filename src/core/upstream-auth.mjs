@@ -41,9 +41,9 @@ export class UpstreamAuth {
     if (!doc?.data || doc.data.type!=='users' || typeof doc.data.id!=='string' || !doc.data.id || doc.data.id.length>256) fail('TIDAL_IDENTITY_FAILED','TIDAL did not return a valid user identity.',502);
     return {subject:doc.data.id,country:typeof doc.data.attributes?.countryCode==='string'?doc.data.attributes.countryCode:undefined};
   }
-  saveGrant(token, identity) {
+  async saveGrant(token, identity) {
     const id=opaque();
-    this.store.tx(s=>{s.grants[id]={id,subject:identity.subject,country:identity.country,token,createdAt:this.now(),disabled:false};});
+    await this.store.tx(s=>{s.grants[id]={id,subject:identity.subject,country:identity.country,token,createdAt:this.now(),disabled:false};});
     return id;
   }
   grant(id) { return id?this.store.read(s=>s.grants[id]):undefined; }
@@ -60,10 +60,10 @@ export class UpstreamAuth {
         const next=await this.tokenRequest({grant_type:'refresh_token',refresh_token:grant.token.refreshToken},grant.token.scopes);
         if (!next.refreshToken) next.refreshToken=grant.token.refreshToken;
         // A late refresh MUST NOT resurrect a disconnected grant.
-        this.store.tx(s=>{if (!s.grants[grantId] || s.grants[grantId].disabled) fail('TIDAL_RECONNECT_REQUIRED','This account was disconnected.',401);s.grants[grantId].token=next;});
+        await this.store.tx(s=>{if (!s.grants[grantId] || s.grants[grantId].disabled) fail('TIDAL_RECONNECT_REQUIRED','This account was disconnected.',401);s.grants[grantId].token=next;});
         return next.accessToken;
       } catch (error) {
-        if (error instanceof AppError && error.code==='TIDAL_RECONNECT_REQUIRED') this.store.tx(s=>{if(s.grants[grantId]){s.grants[grantId].disabled=true;s.grants[grantId].token={scopes:[]};}});
+        if (error instanceof AppError && error.code==='TIDAL_RECONNECT_REQUIRED') await this.store.tx(s=>{if(s.grants[grantId]){s.grants[grantId].disabled=true;s.grants[grantId].token={scopes:[]};}});
         throw error;
       } finally { this.inflight.delete(grantId); }
     })();
@@ -77,8 +77,8 @@ export class UpstreamAuth {
     const job=(async()=>{try{this.appToken=await this.tokenRequest({grant_type:'client_credentials'});return this.appToken.accessToken;}finally{this.inflight.delete('client');}})();
     this.inflight.set('client',job);return job;
   }
-  disconnect(grantId) {
-    this.store.tx(s=>{
+  async disconnect(grantId) {
+    await this.store.tx(s=>{
       if(s.grants[grantId]) delete s.grants[grantId];
       for (const [k,v] of Object.entries(s.access)) if(v.grantId===grantId) delete s.access[k];
       for (const v of Object.values(s.families)) if(v.grantId===grantId) v.revoked=true;

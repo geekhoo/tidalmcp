@@ -59,10 +59,10 @@ export function makeHttpHandler({config,broker,mcpHandler,audit}) {
       if(route==='/register'&&req.method==='POST') {
         if(!String(req.headers['content-type']).startsWith('application/json'))fail('invalid_request','Registration requires application/json.',415);
         let body;try{body=JSON.parse(await requestBody(req));}catch(error){if(error instanceof AppError)throw error;fail('invalid_request','Malformed JSON.');}
-        status=201;return sendJson(res,201,broker.register(body));
+        status=201;return sendJson(res,201,await broker.register(body));
       }
       if(route==='/authorize'&&req.method==='GET') {
-        const view=broker.begin(parameters(url.searchParams));status=200;
+        const view=await broker.begin(parameters(url.searchParams));status=200;
         res.setHeader('Set-Cookie',`${cookieName}=${view.cookie}; Path=/; HttpOnly; SameSite=Lax; Max-Age=600${config.local?'':'; Secure'}`);
         res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'});
         res.end(`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Authorize TIDAL MCP</title><style>body{font:16px/1.5 system-ui;color:#2a302e;background:#fcfcfc;margin:40px auto;padding:24px;max-width:640px}button{padding:10px 18px;margin:12px 8px 0 0;border:1px solid #cfceca;border-radius:9999px;background:white;color:#2a302e;cursor:pointer}button[value=approve]{background:#2a302e;color:white}code{overflow-wrap:anywhere}button:focus-visible{outline:3px solid #2c5d63;outline-offset:3px}</style><main><h1>Connect your TIDAL account</h1><p><strong>${escapeHtml(view.clientName)}</strong> requests access through this MCP server.</p><p>Permissions: <strong>${escapeHtml(view.scopes.join(', '))}</strong>.</p><p>${view.scopes.includes('tidal:write')?'This permits changes to playlists and saved music. Only approve a client you trust to follow your instructions.':'This is read-only access to your profile, playlists and saved music.'}</p><p>You will authenticate on TIDAL. Your TIDAL tokens stay on this server and are not sent to the AI client.</p><p>Client callback: <code>${escapeHtml(view.redirectUri)}</code></p><form method="post" action="/consent"><input type="hidden" name="consent_id" value="${escapeHtml(view.consentId)}"><input type="hidden" name="csrf" value="${escapeHtml(view.csrf)}"><button name="decision" value="approve">Continue to TIDAL</button><button name="decision" value="deny">Cancel</button></form></main></html>`);return;
@@ -70,14 +70,14 @@ export function makeHttpHandler({config,broker,mcpHandler,audit}) {
       if(route==='/consent'&&req.method==='POST') {
         if(origin!==config.origin)fail('invalid_request','Consent requires a same-origin browser submission.',403);
         if(!String(req.headers['content-type']).startsWith('application/x-www-form-urlencoded'))fail('invalid_request','Expected form body.',415);
-        const form=parameters(await requestBody(req));const result=broker.consent(form.consent_id,form.csrf,cookieValue(req.headers.cookie,cookieName),form.decision==='approve');status=302;return redirect(res,result.url,form.decision!=='approve');
+        const form=parameters(await requestBody(req));const result=await broker.consent(form.consent_id,form.csrf,cookieValue(req.headers.cookie,cookieName),form.decision==='approve');status=302;return redirect(res,result.url,form.decision!=='approve');
       }
       if(route==='/tidal/callback'&&req.method==='GET') {const destination=await broker.callback(parameters(url.searchParams),cookieValue(req.headers.cookie,cookieName));status=302;return redirect(res,destination,true);}
       if((route==='/token'||route==='/revoke')&&req.method==='POST') {
         if(req.headers.authorization)fail('invalid_client','Use public-client client_id and PKCE; Basic authentication is not supported here.',401);
         if(!String(req.headers['content-type']).startsWith('application/x-www-form-urlencoded'))fail('invalid_request','Expected application/x-www-form-urlencoded.',415);
         const form=parameters(await requestBody(req));status=200;
-        if(route==='/revoke'){broker.revoke(form);return sendJson(res,200,{});}return sendJson(res,200,broker.token(form));
+        if(route==='/revoke'){await broker.revoke(form);return sendJson(res,200,{});}return sendJson(res,200,await broker.token(form));
       }
       status=404;sendJson(res,404,{error:'not_found'});
     }catch(error){status=error instanceof AppError?error.status:500;if(!res.headersSent)sendJson(res,status,{error:error instanceof AppError?error.code:'server_error',error_description:publicError(error).message,requestId});else res.end();}

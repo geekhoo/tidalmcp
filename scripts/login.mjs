@@ -2,7 +2,7 @@ import { createServer } from 'node:http';
 import { makeRuntime } from '../src/runtime.mjs';
 import { opaque, equalSecret, publicError } from '../src/core/util.mjs';
 import { READ_SCOPES, WRITE_SCOPES } from '../src/core/upstream-auth.mjs';
-const runtime=makeRuntime();
+const runtime=await makeRuntime();
 const state=opaque(),redirect='http://127.0.0.1:8765/callback';
 const login=runtime.auth.loginUrl(state,[...READ_SCOPES,...(runtime.config.enableWrites?WRITE_SCOPES:[])],redirect);
 let complete=false;
@@ -15,8 +15,8 @@ const server=createServer(async(req,res)=>{
     if(url.searchParams.has('error'))throw new Error('Authorization denied');
     const code=url.searchParams.get('code');if(!code)throw new Error('Missing code');
     const token=await runtime.auth.exchange(code,login.verifier,redirect,login.scopes),identity=await runtime.auth.identify(token);
-    const prior=runtime.store.read(s=>s.profiles[runtime.config.profile]);if(prior)runtime.auth.disconnect(prior);
-    const id=runtime.auth.saveGrant(token,identity);runtime.store.tx(s=>{s.profiles[runtime.config.profile]=id;});
+    const prior=runtime.store.read(s=>s.profiles[runtime.config.profile]);if(prior)await runtime.auth.disconnect(prior);
+    const id=await runtime.auth.saveGrant(token,identity);await runtime.store.tx(s=>{s.profiles[runtime.config.profile]=id;});
     res.writeHead(200,{'Content-Type':'text/plain','Cache-Control':'no-store','Referrer-Policy':'no-referrer','Content-Security-Policy':"default-src 'none'"});res.end('TIDAL connected. Close this tab and restart your MCP client.');
     console.error('TIDAL connected; tokens were encrypted locally.');
   }catch(error){res.writeHead(400,{'Content-Type':'text/plain','Cache-Control':'no-store'});res.end('Login failed. Start a new login; no credentials were displayed.');console.error(JSON.stringify(publicError(error)));}

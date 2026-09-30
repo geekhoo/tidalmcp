@@ -45,8 +45,8 @@ export class TidalService {
         case 'tidal_list_collection':data=await this.page(principal,`/${COLLECTIONS[args.kind]}/me/relationships/items`,{include:'items',locale:args.locale||'en-US','page[cursor]':args.cursor},'collection.read');break;
         case 'tidal_prepare_change':data=await this.plans.prepare(principal,args.change);break;
         case 'tidal_commit_change':data=await this.plans.commit(principal,args.planId,args.digest,args.confirm);break;
-        case 'tidal_cancel_change':data=this.plans.cancel(principal,args.planId);break;
-        case 'tidal_disconnect':this.auth.disconnect(principal.grantId);data={disconnected:true,tidalGrantRevoked:false,message:'This connection’s local tokens and MCP access were removed. Manage the TIDAL-side grant in your TIDAL account settings.'};break;
+        case 'tidal_cancel_change':data=await this.plans.cancel(principal,args.planId);break;
+        case 'tidal_disconnect':await this.auth.disconnect(principal.grantId);data={disconnected:true,tidalGrantRevoked:false,message:'This connection’s local tokens and MCP access were removed. Manage the TIDAL-side grant in your TIDAL account settings.'};break;
       }
       // Preserve the originating read operation so a host-rendered first page can paginate.
       if(Array.isArray(data?.items))data.source={tool:name,arguments:structuredClone(args)};
