@@ -9,6 +9,8 @@ import widgetHtml from '../../dist/widget-resource.mjs';
 
 // One runtime per warm instance: the whole state document is CAS-persisted to a site-wide
 // Blobs store on every transaction (see src/core/blobs-store.mjs for the concurrency contract).
+// Routes are exposed through netlify.toml [[redirects]] rewrites to this function's default
+// path; config.path proved unreliable on this platform (Netlify support: use rewrites).
 let runtimePromise;
 function getRuntime() {
   return runtimePromise ??= (async () => {
@@ -19,10 +21,6 @@ function getRuntime() {
     return await makeRuntime({ config, send: sdkSend, store, audit });
   })();
 }
-const routes = ['/mcp', '/healthz', '/register', '/authorize', '/consent', '/tidal/callback', '/token', '/revoke',
-  '/.well-known/oauth-protected-resource', '/.well-known/oauth-protected-resource/mcp', '/.well-known/oauth-authorization-server'];
-export const config = { path: routes };
-
 export default async (request, context) => {
   const runtime = await getRuntime();
   const mcpHandler = async (req, res, body, principal) => {

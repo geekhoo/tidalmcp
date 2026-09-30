@@ -10,3 +10,50 @@
 
 [functions]
   node_bundler = "esbuild"
+
+# The MCP endpoint and OAuth broker routes are rewrites to the server function.
+# config.path routing proved unreliable (Netlify support recommends rewrites).
+[[redirects]]
+  from = "/mcp"
+  to = "/.netlify/functions/server"
+  status = 200
+[[redirects]]
+  from = "/healthz"
+  to = "/.netlify/functions/server"
+  status = 200
+[[redirects]]
+  from = "/register"
+  to = "/.netlify/functions/server"
+  status = 200
+[[redirects]]
+  from = "/authorize"
+  to = "/.netlify/functions/server"
+  status = 200
+[[redirects]]
+  from = "/consent"
+  to = "/.netlify/functions/server"
+  status = 200
+[[redirects]]
+  from = "/tidal/callback"
+  to = "/.netlify/functions/server"
+  status = 200
+[[redirects]]
+  from = "/token"
+  to = "/.netlify/functions/server"
+  status = 200
+[[redirects]]
+  from = "/revoke"
+  to = "/.netlify/functions/server"
+  status = 200
+[[redirects]]
+  from = "/.well-known/oauth-protected-resource"
+  to = "/.netlify/functions/server"
+  status = 200
+[[redirects]]
+  from = "/.well-known/oauth-protected-resource/mcp"
+  to = "/.netlify/functions/server"
+  status = 200
+[[redirects]]
+  from = "/.well-known/oauth-authorization-server"
+  to = "/.netlify/functions/server"
+  status = 200
