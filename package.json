@@ -1,0 +1,45 @@
+{
+  "name": "tidal-mcp-app",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "TIDAL catalogue and user-library MCP server with optional MCP Apps UI",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.16.0"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env src/main.mjs --http",
+    "stdio": "node --env-file-if-exists=.env src/main.mjs --stdio",
+    "login": "node --env-file-if-exists=.env scripts/login.mjs",
+    "logout": "node --env-file-if-exists=.env scripts/logout.mjs",
+    "keygen": "node scripts/keygen.mjs",
+    "build": "node scripts/build.mjs",
+    "tokens": "node scripts/tokens.mjs",
+    "demo": "node scripts/demo.mjs",
+    "test": "node --test tests/core/*.test.mjs",
+    "test:coverage": "node --experimental-test-coverage --test tests/core/*.test.mjs",
+    "test:mcp": "node --test tests/mcp/*.test.mjs",
+    "test:browser": "node --test tests/browser/*.test.mjs",
+    "check": "node scripts/check.mjs",
+    "schema:refresh": "node scripts/refresh-schema.mjs",
+    "audit:verify": "node scripts/verify-audit.mjs",
+    "verify": "npm run check && npm run build && npm test && npm run test:mcp",
+    "docs": "node scripts/generate-docs.mjs",
+    "manifest:verify": "node scripts/verify-manifest.mjs",
+    "test:browser:python": "python tests/browser/run.py"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "2.0.0",
+    "@modelcontextprotocol/client": "2.0.0",
+    "@modelcontextprotocol/core": "2.0.0",
+    "@modelcontextprotocol/node": "2.0.0",
+    "@modelcontextprotocol/ext-apps": "2.0.3",
+    "zod": "4.2.0",
+    "@tidal-music/api": "0.47.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12",
+    "@playwright/test": "1.57.0"
+  }
+}

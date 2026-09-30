@@ -1,0 +1,108 @@
+const KINDS=['tracks','albums','artists','playlists','videos'];
+const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
+const safeUrl=(value,images=false)=>{try{const u=new URL(value),hosts=images?['resources.tidal.com','images.tidal.com']:['tidal.com','www.tidal.com','listen.tidal.com'];return u.protocol==='https:'&&hosts.includes(u.hostname)&&!u.username&&!u.password?u.href:undefined;}catch{return undefined;}};
+const unpack=result=>{if(result?.structuredContent)return result.structuredContent;if(result?.ok!==undefined)return result;try{return JSON.parse(result?.content?.find(c=>c.type==='text')?.text||'{}');}catch{return {ok:false,error:{message:'The host returned an unreadable result.'}};}};
+export function createView(root,adapter,{demo=false,view='inline'}={}) {
+  root.dataset.view=view;
+  root.innerHTML=`<div class="shell"><header class="topbar"><div class="wordmark"><span class="mark" aria-hidden="true">♫</span><span>Music workspace</span></div><button class="quiet status" id="connection"><span class="dot"></span><span id="connection-label">Check connection</span></button></header><p class="demo-banner" id="demo" hidden>Interactive demo · fictional music and an in-memory account. No calls are made to TIDAL.</p><main class="content"><div class="hero"><div><h1>Explore TIDAL</h1><p class="muted">Find music. Make it yours.</p></div><button class="quiet inline-only" id="expand">Expand ↗</button><button class="quiet full-only" id="new-playlist">New playlist +</button></div><nav class="nav full-only" aria-label="Music views"><button data-mode="discovery" aria-current="true">Discover</button><button data-mode="library" aria-current="false">Saved music</button><button data-mode="playlists" aria-current="false">My playlists</button></nav><form id="search" class="search full-only"><label class="sr-only" for="query">Search TIDAL</label><input id="query" type="search" placeholder="Search for a track, artist or album" maxlength="200" required autocomplete="off"><button class="primary" type="submit">Search</button></form><div class="filters full-only" id="filters"><div id="kind-buttons" role="group" aria-label="Resource type"></div><label class="country">Market <input id="country" value="SG" maxlength="2" pattern="[A-Z]{2}" aria-label="Country code"></label></div><div id="message" class="message" role="status" aria-live="polite" hidden></div><div class="selection full-only" id="selection" hidden><strong id="selection-count"></strong><button id="save-selected">Save selected</button><button id="add-selected" class="primary">Add to playlist</button><button id="remove-selected" class="danger" hidden>Remove from playlist</button><button id="clear-selected" class="quiet">Clear</button></div><div class="result-head"><h2 id="result-title">Music, one conversation away.</h2><span id="result-count" class="muted small"></span></div><ul id="results" class="results" aria-label="Music results"></ul><div id="empty" class="empty"><h3>Start with something you love.</h3><p class="muted">Ask your AI assistant for music, or expand this view to search.</p></div><section id="inline-plan" class="inline-plan" hidden aria-label="Change preview"></section><div class="pager"><span id="page-note" class="muted small">Music opens in TIDAL. Playback stays there.</span><button id="next" hidden>Next page →</button></div></main><footer class="footer"><span>Music data by TIDAL · independent MCP integration</span><span>Review before changing your library.</span></footer></div><dialog id="dialog" aria-labelledby="dialog-title"><div class="dialog-head"><h2 id="dialog-title"></h2><button id="dialog-close" class="quiet" aria-label="Close dialog">✕</button></div><div id="dialog-body" class="dialog-body"></div><div id="dialog-actions" class="dialog-actions"></div></dialog>`;
+  const $=id=>root.querySelector('#'+id),state={mode:'discovery',kind:'tracks',items:[],selected:new Map(),nextCursor:null,lastRequest:null,playlistId:null,busy:false,epoch:0,dialogTrigger:null};
+  $('demo').hidden=!demo;
+  if(demo)root.querySelector('.footer span').textContent='Fictional demo data · no TIDAL requests';
+  function message(text,kind=''){const n=$('message');n.textContent=text||'';n.className='message '+kind;n.hidden=!text;}
+  async function call(name,args){const envelope=unpack(await adapter.call(name,args));if(!envelope.ok)throw Object.assign(new Error(envelope.error?.message||'Tool failed.'),{envelope});return envelope.data;}
+  const guard=fn=>async(...args)=>{try{await fn(...args);}catch(error){const text=error.message||'The action failed.';message(text,'error');if($('dialog').open){let n=$('dialog-body').querySelector('[data-dialog-error]');if(!n){n=el('p','', 'message error');n.dataset.dialogError='true';n.setAttribute('role','alert');$('dialog-body').append(n);}n.textContent=text;}}};
+  const button=(text,fn,cls='')=>{const b=el('button',text,cls);b.type='button';b.addEventListener('click',guard(fn));return b;};
+  function openDialog(title){state.dialogTrigger=document.activeElement;$('dialog-title').textContent=title;$('dialog-body').replaceChildren();$('dialog-actions').replaceChildren();if(!$('dialog').open)$('dialog').showModal();}
+  function closeDialog(){$('dialog').close();state.dialogTrigger?.focus?.();}
+  $('dialog-close').onclick=closeDialog;$('dialog').addEventListener('cancel',()=>state.dialogTrigger?.focus?.());
+  function summaryRow(parent,label,value){const row=el('div');row.append(el('strong',label+' '),el('span',value));parent.append(row);}
+  function field(label,value='',type='text'){const wrapper=el('label',label),input=el(type==='textarea'?'textarea':'input');if(type!=='textarea')input.type=type;input.value=value;wrapper.append(input);$('dialog-body').append(wrapper);return input;}
+  async function external(item){const url=safeUrl(item.url);if(!url)throw new Error('No safe TIDAL link is available for this item.');const result=await adapter.open(url);if(result?.isError)throw new Error('The host declined to open the TIDAL link.');}
+  function duration(value){if(typeof value!=='string')return '';const m=value.match(/^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?$/);if(!m)return value;const seconds=Number(m[1]||0)*3600+Number(m[2]||0)*60+Math.floor(Number(m[3]||0));return `${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')}`;}
+  const selectionKey=item=>`${item.type}:${item.id}:${item.occurrence?.itemId||''}`;
+  function updateSelection(){const count=state.selected.size;$('selection').hidden=count===0;$('selection-count').textContent=`${count} selected`;$('remove-selected').hidden=!state.playlistId;$('save-selected').disabled=count>50;$('add-selected').disabled=count>50;}
+  function clearSelection(){state.selected.clear();updateSelection();renderItems();}
+  function renderItems(){
+    const list=$('results');list.replaceChildren();const shown=root.dataset.view==='inline'?state.items.slice(0,6):state.items;
+    $('empty').hidden=shown.length>0;$('result-count').textContent=shown.length?`${shown.length}${shown.length<state.items.length?' of '+state.items.length:''} on this page`:'';
+    for(const item of shown){
+      const row=el('li',undefined,'row'),key=selectionKey(item);row.classList.toggle('selected',state.selected.has(key));
+      if(['tracks','videos'].includes(item.type)){
+        const label=el('label',undefined,'row-check full-only'),check=el('input');check.type='checkbox';check.checked=state.selected.has(key);check.setAttribute('aria-label',`Select ${item.title}`);check.onchange=()=>{if(check.checked)state.selected.set(key,item);else state.selected.delete(key);row.classList.toggle('selected',check.checked);updateSelection();};label.append(check);row.append(label);
+      }
+      const imageUrl=safeUrl(item.imageUrl,true);let art;
+      if(imageUrl){art=el('img',undefined,'art');art.src=imageUrl;art.alt='';art.loading='lazy';art.referrerPolicy='no-referrer';art.onerror=()=>{const placeholder=el('span','♫','art');placeholder.setAttribute('aria-hidden','true');art.replaceWith(placeholder);};}
+      else{art=el('span',item.type==='artists'?'◎':'♫','art');art.setAttribute('aria-hidden','true');}
+      const copy=el('div',undefined,'row-copy'),title=button(item.title,()=>inspect(item),'row-title');copy.append(title);
+      if(item.explicit){const badge=el('span','E','explicit');badge.title='Explicit';badge.setAttribute('aria-label','Explicit');copy.append(badge);}
+      copy.append(el('p',item.artists?.length?item.artists.join(', '):`${item.type.slice(0,-1)} · ${item.id}`));
+      const actions=el('div',undefined,'row-actions');if(item.duration)actions.append(el('span',duration(item.duration),'duration'));if(safeUrl(item.url))actions.append(button('Open ↗',()=>external(item),'open-button'));
+      row.append(art,copy,actions);list.append(row);
+    }
+    $('next').hidden=!state.nextCursor;$('next').disabled=state.busy;
+  }
+  function acceptData(data,title){
+    if(Array.isArray(data.items)){if(data.source?.tool){state.lastRequest={name:data.source.tool,args:data.source.arguments||{},title:title||'Your results'};const a=data.source.arguments;state.playlistId=data.source.tool==='tidal_related'&&a?.kind==='playlists'&&a?.relation==='items'?a.id:null;}state.items=data.items;state.nextCursor=data.nextCursor||null;$('result-title').textContent=title||'Your results';renderItems();if(data.paginationWarning)message(data.paginationWarning,'error');}
+    if(data.planId&&data.digest)showPlan(data);
+    if(data.applied){message(data.partial?'Change applied with skipped items. Inspect the returned response.':'Your change was applied.','success');clearSelection();}
+  }
+  async function load(name,args,title){
+    const epoch=++state.epoch;state.busy=true;state.lastRequest={name,args:{...args},title};message('');$('results').replaceChildren(...Array.from({length:4},()=>{const n=el('li',undefined,'skeleton');n.setAttribute('aria-hidden','true');return n;}));$('results').setAttribute('aria-busy','true');$('empty').hidden=true;
+    try{const data=await call(name,args);if(epoch===state.epoch)acceptData(data,title);}catch(error){if(epoch===state.epoch){state.items=[];renderItems();message(error.message,'error');}}finally{if(epoch===state.epoch){state.busy=false;$('results').setAttribute('aria-busy','false');$('next').disabled=false;}}
+  }
+  function queryArgs(){return {query:$('query').value.trim(),kind:state.kind,countryCode:$('country').value.toUpperCase()};}
+  async function refresh(){
+    state.playlistId=null;
+    if(state.mode==='library')return load('tidal_list_collection',{kind:state.kind},'Saved '+state.kind);
+    if(state.mode==='playlists')return load('tidal_list_playlists',{countryCode:$('country').value.toUpperCase()},'My playlists');
+    const args=queryArgs();if(!args.query)return;return load('tidal_search',args,`Results for “${args.query}”`);
+  }
+  for(const kind of KINDS){const b=button(kind[0].toUpperCase()+kind.slice(1),async()=>{if(state.kind!==kind)clearSelection();state.kind=kind;for(const node of $('kind-buttons').children)node.setAttribute('aria-pressed',String(node.dataset.kind===kind));await refresh();});b.dataset.kind=kind;b.setAttribute('aria-pressed',String(kind===state.kind));$('kind-buttons').append(b);}
+  $('kind-buttons').style.display='contents';
+  for(const b of root.querySelectorAll('[data-mode]'))b.addEventListener('click',guard(async()=>{state.mode=b.dataset.mode;clearSelection();root.querySelectorAll('[data-mode]').forEach(n=>n.setAttribute('aria-current',String(n===b)));$('search').hidden=state.mode!=='discovery';$('filters').hidden=state.mode==='playlists';await refresh();}));
+  $('search').addEventListener('submit',event=>{event.preventDefault();void guard(refresh)();});
+  $('next').onclick=guard(async()=>{if(!state.nextCursor||!state.lastRequest)return;const r=state.lastRequest;await load(r.name,{...r.args,cursor:state.nextCursor},r.title);});
+  $('expand').onclick=guard(async()=>{const result=await adapter.expand?.();if(result===false){message('This host did not allow expansion. Use the same tools through the conversation.');return;}root.dataset.view='full';renderItems();});
+  $('connection').onclick=guard(async()=>{const status=await call('tidal_auth_status',{});$('connection-label').textContent=demo?'Demo account':status.connected?'TIDAL connected':'Catalogue only';openDialog('Connection');$('dialog-body').append(el('p',status.connected?'Your TIDAL account is connected.':'No TIDAL account is linked.'),el('p',status.reconnect||'', 'muted'),el('p',`Granted permissions: ${(status.upstreamScopes||[]).join(', ')||'none'}`,'small'));if(status.connected)$('dialog-actions').append(button('Disconnect this account',async()=>{openDialog('Disconnect TIDAL?');$('dialog-body').append(el('p','This removes this connection’s local tokens and MCP authorization. It does not revoke the grant at TIDAL.'));$('dialog-actions').append(button('Keep connected',closeDialog),button('Confirm disconnect',async()=>{await call('tidal_disconnect',{confirm:true});closeDialog();$('connection-label').textContent='Disconnected';message('This connection was disconnected.','success');},'danger'));},'danger'));});
+  async function inspect(item){
+    const data=await call('tidal_get',{kind:item.type,id:item.id,countryCode:$('country').value.toUpperCase()}),full=data.items?.[0]||item;
+    openDialog(full.title);const facts=el('dl',undefined,'detail-facts');for(const[k,v]of [['Type',full.type],['Artists',(full.artists||[]).join(', ')||'Not supplied'],['TIDAL ID',full.id],['Duration',duration(full.duration)||'Not supplied']])facts.append(el('dt',k),el('dd',v));$('dialog-body').append(facts);
+    if(typeof full.attributes?.description==='string')$('dialog-body').append(el('p',full.attributes.description,'muted'));
+    const details=el('details'),summary=el('summary','Inspect original API document');details.append(summary,el('pre',JSON.stringify(data.document,null,2)));$('dialog-body').append(details);
+    if(safeUrl(full.url))$('dialog-actions').append(button('Open in TIDAL ↗',()=>external(full),'primary'));
+    if(['albums','playlists'].includes(full.type))$('dialog-actions').append(button('Browse items',async()=>{closeDialog();state.playlistId=full.type==='playlists'?full.id:null;clearSelection();await load('tidal_related',{kind:full.type,id:full.id,relation:'items',countryCode:$('country').value.toUpperCase()},full.title);}));
+    if(full.type==='playlists'&&root.dataset.view==='full'){$('dialog-actions').append(button('Edit details',()=>compose(full)),button('Delete',async()=>{const plan=await call('tidal_prepare_change',{change:{action:'delete_playlist',playlistId:full.id}});showPlan(plan);},'danger'));}
+  }
+  async function compose(existing){
+    openDialog(existing?'Edit playlist':'Create a playlist');const name=field('Playlist name',existing?.attributes?.name||''),description=field('Description',existing?.attributes?.description||'','textarea');name.maxLength=255;description.maxLength=10000;
+    const label=el('label','Visibility'),access=el('select');for(const[v,t]of [['UNLISTED','Unlisted — accessible by link'],['PUBLIC','Public — discoverable']]){const option=el('option',t);option.value=v;access.append(option);}access.value=['PUBLIC','UNLISTED'].includes(existing?.attributes?.accessType)?existing.attributes.accessType:'UNLISTED';label.append(access);$('dialog-body').append(label,el('p','Unlisted does not mean private. Tracks can be added after the playlist is created.','small muted'));
+    $('dialog-actions').append(button('Cancel',closeDialog),button('Preview change',async()=>{if(!name.value.trim())throw new Error('Enter a playlist name.');const change={action:existing?'update_playlist':'create_playlist',...(existing?{playlistId:existing.id}:{}),name:name.value.trim(),description:description.value,accessType:access.value};showPlan(await call('tidal_prepare_change',{change}));},'primary'));name.focus();
+  }
+  function showPlan(plan){
+    const inline=root.dataset.view==='inline';let body,actions;
+    if(inline){body=$('inline-plan');body.hidden=false;body.replaceChildren(el('h2','Review this change'));actions=el('div',undefined,'dialog-actions');}
+    else{openDialog('Review this change');body=$('dialog-body');actions=$('dialog-actions');}
+    const summary=el('div',undefined,'preview-summary');summaryRow(summary,'Action',plan.action.replaceAll('_',' '));if(plan.guard?.name)summaryRow(summary,'Playlist',plan.guard.name);summaryRow(summary,'Endpoint',plan.method+' '+plan.path);if(plan.body?.data?.attributes?.name)summaryRow(summary,'Name',plan.body.data.attributes.name);if(plan.body?.data?.attributes?.accessType)summaryRow(summary,'Visibility',plan.body.data.attributes.accessType);if(Array.isArray(plan.body?.data))summaryRow(summary,'Items',String(plan.body.data.length));summaryRow(summary,'Preview expires',new Date(plan.expiresAt).toLocaleTimeString());body.append(summary,el('p','Apply only after checking the target and complete payload below. This changes your TIDAL account.','muted'));
+    const details=el('details'),label=el('summary','Exact payload and approval digest');details.append(label,el('pre',JSON.stringify({method:plan.method,path:plan.path,body:plan.body,digest:plan.digest},null,2)));body.append(details);
+    const result=el('p','', 'small');result.setAttribute('role','status');result.setAttribute('aria-live','polite');body.append(result);
+    const cancel=button('Cancel',async()=>{await call('tidal_cancel_change',{planId:plan.planId});if(inline)body.hidden=true;else closeDialog();});
+    const apply=button('Confirm and apply',async()=>{
+      apply.disabled=true;cancel.disabled=true;result.textContent='Applying your approved change…';
+      try{const data=await call('tidal_commit_change',{planId:plan.planId,digest:plan.digest,confirm:true});result.textContent=data.partial?'Applied with skipped items. Inspect the response below.':'Change applied successfully.';result.className='message success';const response=el('details');response.append(el('summary','Write response'),el('pre',JSON.stringify(data,null,2)));body.append(response);apply.textContent='Applied';cancel.textContent='Close';cancel.replaceWith(button('Close',()=>{if(inline)body.hidden=true;else closeDialog();}));clearSelection();message(result.textContent,'success');}
+      catch(error){result.textContent=error.message;result.className='message error';const code=error.envelope?.error?.code;if(['WRITE_OUTCOME_UNKNOWN','TIDAL_CONFLICT','TIDAL_RATE_LIMITED'].includes(code)){apply.textContent='Retry this same approved change';apply.disabled=false;}else{apply.textContent='Not applied';}cancel.disabled=false;}
+    },'primary');actions.append(cancel,apply);if(inline)body.append(actions);
+  }
+  $('new-playlist').onclick=guard(()=>compose());$('clear-selected').onclick=clearSelection;
+  $('save-selected').onclick=guard(async()=>{const values=[...state.selected.values()];if(!values.length)return;if(values.some(v=>v.type!==values[0].type))throw new Error('Save one resource type at a time.');showPlan(await call('tidal_prepare_change',{change:{action:'save_collection_items',kind:values[0].type,ids:[...new Set(values.map(v=>v.id))]}}));});
+  $('add-selected').onclick=guard(async()=>{
+    const values=[...state.selected.values()];if(!values.length)return;const data=await call('tidal_list_playlists',{});openDialog('Add to a playlist');const label=el('label','Choose a playlist'),select=el('select');for(const item of data.items||[]){const option=el('option',item.title);option.value=item.id;select.append(option);}label.append(select);$('dialog-body').append(label,el('p',`${values.length} selected item(s) will be appended.`,'muted'));if(data.nextCursor)$('dialog-body').append(el('p','Only the first page of playlists is shown. To target another playlist, use its ID through the conversation.','small muted'));if(!select.options.length){$('dialog-body').append(el('p','No owned playlists were found. Create a playlist first.'));return;}$('dialog-actions').append(button('Cancel',closeDialog),button('Preview addition',async()=>{showPlan(await call('tidal_prepare_change',{change:{action:'add_playlist_items',playlistId:select.value,items:values.map(v=>({id:v.id,type:v.type}))}}));},'primary'));
+  });
+  $('remove-selected').onclick=guard(async()=>{const values=[...state.selected.values()];if(!state.playlistId||values.some(v=>typeof v.occurrence?.itemId!=='string'))throw new Error('Occurrence IDs are missing. Reload the playlist items before removing duplicates.');showPlan(await call('tidal_prepare_change',{change:{action:'remove_playlist_items',playlistId:state.playlistId,items:values.map(v=>({id:v.id,type:v.type,itemId:v.occurrence.itemId}))}}));});
+  return {
+    receive(result){const envelope=unpack(result);if(envelope.ok)acceptData(envelope.data);else message(envelope.error?.message||'The tool failed.','error');},
+    input(input){const args=input?.arguments||input;if(args?.query)$('query').value=args.query;if(KINDS.includes(args?.kind)){state.kind=args.kind;for(const b of $('kind-buttons').children)b.setAttribute('aria-pressed',String(b.dataset.kind===state.kind));}if(args?.countryCode)$('country').value=args.countryCode;},
+    context(context){if(context?.displayMode){root.dataset.view=context.displayMode==='fullscreen'?'full':'inline';renderItems();}const bottom=context?.safeAreaInsets?.bottom;if(Number.isFinite(bottom))root.style.setProperty('--safe-bottom',Math.min(bottom,200)+'px');},
+    async start(){if(demo){$('connection-label').textContent='Demo account';$('query').value='night';await refresh();}},
+    state
+  };
+}
