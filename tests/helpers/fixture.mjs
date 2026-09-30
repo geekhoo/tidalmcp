@@ -85,10 +85,10 @@ export class FakeTidal {
     return response(status,data);
   }
 }
-export function fixture(options={}) {
+export async function fixture(options={}) {
   const cfg={...testConfig,...options.config},store=new MemoryStore(),fake=options.fake||new FakeTidal(),now=options.now||Date.now;
   const auth=new UpstreamAuth({store,config:cfg,fetchImpl:options.fetchImpl||fake.fetch.bind(fake),now});
-  const grantId=auth.saveGrant({accessToken:'synthetic-initial-access',refreshToken:'synthetic-initial-refresh',expiresAt:now()+3600000,scopes:[...READ_SCOPES,...WRITE_SCOPES]},{subject:'demo-user',country:'SG'});
+  const grantId=await auth.saveGrant({accessToken:'synthetic-initial-access',refreshToken:'synthetic-initial-refresh',expiresAt:now()+3600000,scopes:[...READ_SCOPES,...WRITE_SCOPES]},{subject:'demo-user',country:'SG'});
   const principal={grantId,subject:'demo-user',clientId:'synthetic-agent',scopes:['tidal:read','tidal:write'],local:true};
   const client=new TidalClient({auth,send:options.send||(request=>nativeSend(request,options.fetchImpl||fake.fetch.bind(fake))),delay:async()=>{},now}),plans=new Plans({store,client,auth,config:cfg,now}),audit=new Audit(),service=new TidalService({client,auth,plans,config:cfg,audit}),broker=new OAuthBroker({store,auth,config:cfg,now});
   return {config:cfg,store,fake,auth,principal,client,plans,audit,service,broker};

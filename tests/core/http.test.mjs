@@ -5,7 +5,7 @@ import { fixture } from '../helpers/fixture.mjs';
 import { httpServer, parameters } from '../../src/core/http.mjs';
 import { opaque, challenge } from '../../src/core/util.mjs';
 async function setup(t){
- const f=fixture(),received=[];
+ const f=await fixture(),received=[];
  const server=httpServer({config:f.config,broker:f.broker,audit:f.audit,mcpHandler:async(req,res,body,principal)=>{received.push({principal,body});res.writeHead(200,{'Content-Type':'application/json'});res.end(JSON.stringify({testOnly:'HTTP authorization boundary reached'}));}});
  await new Promise(r=>server.listen(0,'127.0.0.1',r));const origin=`http://127.0.0.1:${server.address().port}`;Object.assign(f.config,{origin,resource:origin+'/mcp',callback:origin+'/tidal/callback'});
  t.after(()=>new Promise(r=>{server.closeAllConnections();server.close(r);}));return {...f,server,received,origin};
