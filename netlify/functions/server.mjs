@@ -9,8 +9,9 @@ import widgetHtml from '../../dist/widget-resource.mjs';
 
 // One runtime per warm instance: the whole state document is CAS-persisted to a site-wide
 // Blobs store on every transaction (see src/core/blobs-store.mjs for the concurrency contract).
-// Routes are exposed through netlify.toml [[redirects]] rewrites to this function's default
-// path; config.path proved unreliable on this platform (Netlify support: use rewrites).
+// Routes are exposed via the generated dist/_redirects file (200! rewrites to this
+// function's default path). netlify.toml [[redirects]] were silently not processed and
+// config.path proved unreliable; the deploy-upload _redirects file is what works.
 let runtimePromise;
 function getRuntime() {
   return runtimePromise ??= (async () => {
