@@ -7,6 +7,11 @@
 
 [build.environment]
   NODE_VERSION = "22"
+  # These keys hold documented public defaults (./var, local, 3000, 127.0.0.1, the
+  # loopback callback) that legitimately appear in .env.example and the docs. They
+  # are not secrets; exclude them from secrets scanning so the scan stays useful
+  # for the real credentials (TIDAL_CLIENT_SECRET, TOKEN_ENCRYPTION_KEY).
+  SECRETS_SCAN_OMIT_KEYS = "DATA_DIR,LOCAL_PROFILE,PORT,LISTEN_HOST,OAUTH_REDIRECT_ALLOWLIST,ALLOWED_ORIGINS,WIDGET_DOMAIN"
 
 [functions]
   node_bundler = "esbuild"
