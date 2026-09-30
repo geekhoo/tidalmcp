@@ -30,16 +30,17 @@
     "test:browser:python": "python tests/browser/run.py"
   },
   "dependencies": {
-    "@modelcontextprotocol/server": "2.0.0",
     "@modelcontextprotocol/client": "2.0.0",
     "@modelcontextprotocol/core": "2.0.0",
-    "@modelcontextprotocol/node": "2.0.0",
     "@modelcontextprotocol/ext-apps": "2.0.3",
-    "zod": "4.2.0",
-    "@tidal-music/api": "0.47.0"
+    "@modelcontextprotocol/node": "2.0.0",
+    "@modelcontextprotocol/server": "2.0.0",
+    "@netlify/blobs": "11.1.2",
+    "@tidal-music/api": "0.47.0",
+    "zod": "4.2.0"
   },
   "devDependencies": {
-    "esbuild": "0.25.12",
-    "@playwright/test": "1.57.0"
+    "@playwright/test": "1.57.0",
+    "esbuild": "0.25.12"
   }
 }

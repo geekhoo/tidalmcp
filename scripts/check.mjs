@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 const root=fileURLToPath(new URL('../',import.meta.url));
 function walk(dir){return fs.readdirSync(dir,{withFileTypes:true}).flatMap(d=>d.isDirectory()?walk(path.join(dir,d.name)):[path.join(dir,d.name)]);}
-const files=['src','scripts','web','tests'].flatMap(d=>walk(path.join(root,d))).filter(f=>f.endsWith('.mjs'));
+const files=['src','scripts','web','tests','netlify'].flatMap(d=>walk(path.join(root,d))).filter(f=>f.endsWith('.mjs'));
 for(const file of files){const result=spawnSync(process.execPath,['--check',file],{encoding:'utf8'});if(result.status!==0){console.error(result.stderr);process.exit(1);}}
 const css=fs.readFileSync(path.join(root,'web/tokens.css'),'utf8')+fs.readFileSync(path.join(root,'web/style.css'),'utf8');
 const definitions=new Set([...css.matchAll(/(--[\w-]+)\s*:/g)].map(m=>m[1]));

@@ -1,0 +1,12 @@
+# Netlify configuration for the tidalmcp site.
+# Static: dist/ (MCP Apps widget). Functions: netlify/functions/server.mjs (the /mcp endpoint
+# and OAuth broker, state persisted to Netlify Blobs — see src/core/blobs-store.mjs).
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[functions]
+  node_bundler = "esbuild"
