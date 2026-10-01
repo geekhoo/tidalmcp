@@ -1,5 +1,6 @@
 import { createServer } from 'node:http';
 import { AppError, fail, opaque, escapeHtml, publicError } from './util.mjs';
+import { TIDAL_AUTHORIZE_URL } from './upstream-auth.mjs';
 const MAX_BODY=131072;
 export async function requestBody(req) {
   if(Number(req.headers['content-length'])>MAX_BODY)fail('invalid_request','Request body is too large.',413);
@@ -26,7 +27,10 @@ export function makeHttpHandler({config,broker,mcpHandler,audit}) {
   const redirect=(res,url,clear=false)=>{res.writeHead(302,{Location:url,'Cache-Control':'no-store',...(clear?{'Set-Cookie':`${cookieName}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${config.local?'':'; Secure'}`}:{})});res.end();};
   return async(req,res)=>{
     const requestId=opaque(12);res.setHeader('X-Request-Id',requestId);res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');
-    res.setHeader('Content-Security-Policy',"default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");
+    // Chromium checks form-action on redirects too. Allow only the upstream login
+    // and operator-approved client origins (including cancellation callbacks).
+    const formOrigins=[...new Set([new URL(TIDAL_AUTHORIZE_URL).origin,...config.redirectAllowlist.map(uri=>new URL(uri).origin)])];
+    res.setHeader('Content-Security-Policy',`default-src 'none'; style-src 'unsafe-inline'; form-action 'self' ${formOrigins.join(' ')}; frame-ancestors 'none'; base-uri 'none'`);
     if(!config.local)res.setHeader('Strict-Transport-Security','max-age=31536000');
     let route='unknown',status=500;
     try {

@@ -1,7 +1,6 @@
 /** Adapts a web-standard Request/Response pair to the Node-style (req,res) surface used by
- * makeHttpHandler and the MCP SDK's Node transport, so the same handler runs on Node's http
- * server and on Netlify Functions without code forks. Collects the response synchronously
- * (the handlers use JSON responses, not SSE streaming). */
+ * makeHttpHandler. The original Request remains available to the Netlify MCP adapter, which
+ * passes it to the official web-standard transport after shared auth and body checks. */
 export function webExchange(request, { ip = 'unknown' } = {}) {
   const url = new URL(request.url);
   const headers = {};
@@ -10,6 +9,7 @@ export function webExchange(request, { ip = 'unknown' } = {}) {
     method: request.method,
     url: url.pathname + url.search,
     headers,
+    webRequest: request,
     socket: { remoteAddress: ip },
     async *[Symbol.asyncIterator]() {
       if (!request.body) return;

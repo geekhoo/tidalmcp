@@ -6,11 +6,11 @@ A TIDAL catalogue, saved-music and playlist integration for MCP-compatible agent
 
 ## Delivery status — read this first
 
-The source, fictional-data demo, documentation, executable tests and audit evidence are included. **65 dependency-free core tests and 18 Chromium component checks passed in the delivery environment.** The core tests include real local HTTP OAuth flows backed by a synthetic TIDAL service.
+The original delivery evidence remains unchanged in [audit/REPORT.md](audit/REPORT.md): dependency installation was blocked by `ENOTCACHED`, and SDK/build/live checks were unverified in that environment.
 
-**Production SDK installation, production UI bundling, SDK protocol tests, vulnerability advisory checks, live TIDAL authorization and hosted ChatGPT/Codex verification remain unverified.** npm downloads were unavailable here; the attempted install failed with `ENOTCACHED`, and the SDK/build commands failed because their dependencies were absent. They are not marked as passed or skipped. See [audit/REPORT.md](audit/REPORT.md) and its raw logs.
+The 1 October follow-up installed the pinned SDKs, retained and reviewed `package-lock.json`, built the production UI, passed the core, official SDK and Chromium gates, and deployed fixes to [tidalmcp.netlify.app](https://tidalmcp.netlify.app). Authenticated read tools and pagination were exercised against live TIDAL with writes disabled. See [LIVE_VALIDATION.md](docs/LIVE_VALIDATION.md) for exact failures, remedies and evidence.
 
-There is no fabricated package lock, built SDK bundle, deployment URL, TIDAL credential or production certification. Exact direct dependencies are pinned; install them online, retain the generated `package-lock.json`, and pass the release gates before deployment.
+The official MCP Apps bridge works in the Chromium test host. Interactive rendering in this Codex host remains unverified; resource delivery alone does not establish it. Vulnerability advisory checks and broader production certification remain outside the recorded validation.
 
 ## What is implemented
 
@@ -24,7 +24,7 @@ There is no fabricated package lock, built SDK bundle, deployment URL, TIDAL cre
 | UI | Search and filters, inspect dialogs, saved music, owned playlists, selection, exact-payload previews, confirmations, inline/fullscreen modes, mobile layout. |
 | Design | 155 resolved variables from the supplied design archive; original tokens retained; no font binaries or framework-specific UI dependency. |
 
-The API adapter has **43 explicitly selected method/path bindings**, not the entire TIDAL API. Available-but-unexposed and restricted families are explained in [API_ANALYSIS.md](docs/API_ANALYSIS.md). No audio download, DRM handling, lyrics, device-code login or remote-player control is implemented. Opening a TIDAL link is not a claim that playback started.
+The API adapter has **44 explicitly selected method/path bindings**, not the entire TIDAL API. Available-but-unexposed and restricted families are explained in [API_ANALYSIS.md](docs/API_ANALYSIS.md). No audio download, DRM handling, lyrics, device-code login or remote-player control is implemented. Opening a TIDAL link is not a claim that playback started.
 
 ## Try the demo without npm dependencies or credentials
 

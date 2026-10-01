@@ -6,6 +6,7 @@ const lines=['# Tool reference','','Generated from `src/core/contracts.mjs`. Inp
 for(const t of TOOLS)lines.push('### '+t.name,'','```json',JSON.stringify(t.inputSchema,null,2),'```','');
 fs.writeFileSync(new URL('../docs/TOOL_REFERENCE.md',import.meta.url),lines.join('\n'));
 const selected=[];const add=(method,path,scope,tool)=>selected.push({method,path,scope,tool,status:'implemented_allowlist',tier:'THIRD_PARTY',evidence:'Official published OpenAPI inspected 2026-09-30; refresh script provides full machine inventory.'});
+add('GET','/searchResults','client credentials or search.read','tidal_search');
 for(const k of ['tracks','albums','artists','playlists','videos']){add('GET',`/searchResults/{id}/relationships/${k}`,'client credentials or search.read','tidal_search');add('GET',`/${k}/{id}`,'catalogue; playlists.read for linked account playlists','tidal_get');}
 for(const[k,rels]of Object.entries(RELATIONS))for(const rel of rels)add('GET',`/${k}/{id}/relationships/${rel}`,k==='playlists'?'playlists.read':'catalogue','tidal_related');
 add('GET','/users/{id}','user.read','tidal_get_me');add('GET','/playlists','playlists.read','tidal_list_playlists');

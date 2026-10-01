@@ -10,7 +10,7 @@ export const testConfig={origin:'http://127.0.0.1:3000',resource:'http://127.0.0
 const response=(status,data)=>new Response(status===204?null:JSON.stringify(data),{status,headers:{'Content-Type':'application/vnd.api+json'}});
 export class FakeTidal {
   constructor(){
-    this.requests=[];this.mutations=0;this.refreshes=0;this.tokenCalls=0;this.failures=[];this.idempotency=new Map();this.tick=0;
+    this.requests=[];this.mutations=0;this.refreshes=0;this.tokenCalls=0;this.failures=[];this.idempotency=new Map();this.tick=0;this.searches=new Map();this.searchCounter=0;this.searchNext=undefined;
     this.artists=[['a1','The Quiet Hours'],['a2','June Mercer'],['a3','Northbound'],['a4','Mono Bloom']].map(([id,name])=>({type:'artists',id,attributes:{name}}));
     this.albums=[{type:'albums',id:'al1',attributes:{title:'Night Studies'},relationships:{artists:{data:[{type:'artists',id:'a1'}]}}},{type:'albums',id:'al2',attributes:{title:'Rooms After Dark'},relationships:{artists:{data:[{type:'artists',id:'a2'}]}}}];
     const names=['Night Windows','The Last Train Home','Afterimage','Soft Focus','Late Check-out','A Kind of Blue Hour','Paper Lanterns','Before the City Wakes'];
@@ -38,8 +38,10 @@ export class FakeTidal {
     if(path==='/users/me')return response(200,{data:{type:'users',id:'demo-user',attributes:{countryCode:'SG',name:'Demo listener'}}});
     if(method==='GET'){
       if(parts[0]==='searchResults'){
-        const kind=parts[3],query=parts[1].toLowerCase();const data=(this[kind]||[]).filter(r=>canonical(r).toLowerCase().includes(query)||query==='night'&&kind==='tracks');
-        return response(200,this.doc(data.map(r=>({type:r.type,id:r.id})),url.pathname));
+        if(parts.length===1){const query=url.searchParams.get('filter[query]');if(!query)return response(400,{errors:[{code:'FILTER_QUERY_REQUIRED'}]});const id=`search-${++this.searchCounter}`;this.searches.set(id,query.toLowerCase());return response(200,{data:[{type:'searchResults',id,attributes:{query}}]});}
+        const kind=parts[3],query=this.searches.get(parts[1]);if(!query||!['tracks','albums','artists','playlists','videos'].includes(kind))return response(400,{errors:[{code:'INVALID_RESOURCE_ID'}]});
+        const data=(this[kind]||[]).filter(r=>canonical(r).toLowerCase().includes(query)||query==='night'&&kind==='tracks');
+        const extra=this.searchNext?{links:{next:this.searchNext}}:{};return response(200,this.doc(data.map(r=>({type:r.type,id:r.id})),url.pathname,extra));
       }
       if(parts[0].startsWith('userCollection')){
         const kind=parts[0].replace('userCollection','').toLowerCase();return response(200,this.doc((this.collections[kind]||[]).map(id=>({type:kind,id})),url.pathname));
@@ -48,6 +50,7 @@ export class FakeTidal {
       if(!id)return response(200,this.doc(this[kind]||[],url.pathname));
       const resource=(this[kind]||[]).find(r=>r.id===id);if(!resource)return response(404,{errors:[{code:'NOT_FOUND'}]});
       if(parts[2]==='relationships'){
+        if(kind==='artists'&&parts[3]==='tracks'&&!['FINGERPRINT','NONE'].includes(url.searchParams.get('collapseBy')))return response(400,{errors:[{code:'MISSING_REQUIRED_PARAMETER'}]});
         if(kind==='playlists'&&parts[3]==='items')return response(200,this.doc(this.playlistItems[id]||[],url.pathname));
         const related=parts[3]==='items'||parts[3]==='radio'||parts[3]==='similarTracks'?'tracks':parts[3];return response(200,this.doc(this[related]||[],url.pathname));
       }

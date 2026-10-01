@@ -36,6 +36,7 @@ function chainLine(record, tail) {
 export class BlobsStore extends MemoryStore {
   #etag;
   #serial = Promise.resolve();
+  #requests = Promise.resolve();
   constructor(blobStore, key, stateKey = 'state.enc.json') {
     super();
     if (!Buffer.isBuffer(key) || key.length !== 32) fail('CONFIG_ERROR', 'Encryption key must contain exactly 32 bytes.', 500);
@@ -43,7 +44,7 @@ export class BlobsStore extends MemoryStore {
   }
   async load() {
     let record;
-    try { record = await this.blobStore.getWithMetadata(this.stateKey, { type: 'text' }); }
+    try { record = await this.blobStore.getWithMetadata(this.stateKey, { type: 'text', consistency: 'strong' }); }
     catch { fail('STORE_UNAVAILABLE', 'State storage is unreachable. No plaintext state was loaded.', 500); }
     if (record && record.data !== null && record.data !== undefined) {
       try { this.data = open(JSON.parse(record.data), this.key); }
@@ -51,6 +52,14 @@ export class BlobsStore extends MemoryStore {
       this.#etag = record.etag;
     } else { this.data = emptyState(); this.#etag = record ? record.etag : undefined; }
     return this;
+  }
+  // Keep synchronous read() consumers current without reinitializing the runtime.
+  // Serialize whole requests so a refresh cannot overwrite another local request's
+  // in-flight state. Cross-instance writes continue to use whole-document CAS.
+  withFreshState(fn) {
+    const run = this.#requests.then(async () => { await this.load(); return await fn(); });
+    this.#requests = run.catch(() => {});
+    return run;
   }
   async tx(fn) {
     // Serialize writers within this instance; cross-instance races are handled by CAS.
@@ -69,7 +78,7 @@ export class BlobsStore extends MemoryStore {
         if (outcome.modified) { this.data = copy; this.#etag = outcome.etag || this.#etag; return clone(result); }
         if (++attempts > 8) fail('STORE_CONFLICT', 'State storage is under write contention. Retry the request.', 409);
         let record;
-        try { record = await this.blobStore.getWithMetadata(this.stateKey, { type: 'text' }); }
+        try { record = await this.blobStore.getWithMetadata(this.stateKey, { type: 'text', consistency: 'strong' }); }
         catch { fail('STORE_UNAVAILABLE', 'State storage is unreachable during conflict resolution.', 500); }
         if (!record || record.data === null || record.data === undefined) fail('STORE_CONFLICT', 'State disappeared during a write. Investigate storage before retrying.', 409);
         try { this.data = open(JSON.parse(record.data), this.key); } catch { fail('STORE_DECRYPTION_FAILED', 'State is corrupted or the encryption key is incorrect.', 500); }
@@ -94,7 +103,7 @@ export class BlobsAudit {
   constructor(blobStore, auditKey = 'audit.jsonl') { this.blobStore = blobStore; this.auditKey = auditKey; }
   async load() {
     let record;
-    try { record = await this.blobStore.getWithMetadata(this.auditKey, { type: 'text' }); }
+    try { record = await this.blobStore.getWithMetadata(this.auditKey, { type: 'text', consistency: 'strong' }); }
     catch { fail('STORE_UNAVAILABLE', 'Audit storage is unreachable.', 500); }
     if (record && record.data) {
       const result = verifyAudit(record.data);
@@ -129,7 +138,7 @@ export class BlobsAudit {
         if (outcome.modified) { this.#text = text; this.#tail = tail; this.#etag = outcome.etag || this.#etag; this.#pending.splice(0, attempt.length); continue; }
         // Another writer appended first: re-read the tail and re-chain our pending records.
         let record;
-        try { record = await this.blobStore.getWithMetadata(this.auditKey, { type: 'text' }); }
+        try { record = await this.blobStore.getWithMetadata(this.auditKey, { type: 'text', consistency: 'strong' }); }
         catch { fail('STORE_UNAVAILABLE', 'Audit storage is unreachable during conflict resolution.', 500); }
         const result = verifyAudit(record?.data || '');
         if (!result.valid) throw new Error('Audit integrity check failed; investigate before writing.');

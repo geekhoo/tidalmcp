@@ -33,7 +33,7 @@ TIDAL catalogue/library MCP server with an optional MCP Apps UI. Plain Node.js E
 ## Hard rules
 
 - Use the official SDK boundaries (MCP SDK v2, MCP Apps, TIDAL API SDK); never replace them with handwritten MCP JSON-RPC.
-- Do not add undocumented/internal TIDAL routes, arbitrary URL/header tools, audio download, DRM or lyrics features, or credentials in UI/tool output. The adapter is a curated allowlist (43 bindings in `docs/endpoint-allowlist.json`), not the full API.
+- Do not add undocumented/internal TIDAL routes, arbitrary URL/header tools, audio download, DRM or lyrics features, or credentials in UI/tool output. The adapter is a curated allowlist (44 bindings in `docs/endpoint-allowlist.json`), not the full API.
 - Never alter `audit/` results to imply a blocked check passed. Blocked commands are recorded honestly; delivery manifests are refreshed only as a new release artifact — do not rewrite historical evidence.
 - `package-lock.json` was absent from the reviewed delivery; keep the one `npm install` generates and review it before release (CI falls back to `npm install` with a warning when it is missing).
 - npm 11+ may warn that esbuild's postinstall script was blocked; the build still works (the platform binary ships via the `@esbuild/*` optional dependency).

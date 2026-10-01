@@ -26,7 +26,7 @@
     {
       "name": "tidal_search",
       "title": "Search TIDAL",
-      "description": "Search one catalogue type in a country. IDs and nextCursor are opaque. Use the returned cursor with the same query and kind; there is no universal page-size parameter.",
+      "description": "Search one catalogue type in a country. IDs and nextCursor are opaque. Use the returned cursor with unchanged query, kind, countryCode and explicitFilter arguments; the cursor is route-bound. There is no universal page-size parameter.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -112,7 +112,7 @@
     {
       "name": "tidal_related",
       "title": "Browse related music",
-      "description": "Read an allowlisted relationship: albums/items or artists; artists/albums or tracks; tracks/albums, artists, radio or similarTracks; playlists/items or coverArt. Item occurrence metadata is retained for duplicate-safe playlist edits.",
+      "description": "Read an allowlisted relationship: albums/items or artists; artists/albums or tracks; tracks/albums, artists, radio or similarTracks; playlists/items or coverArt. Artist-track reads use the application-selected collapseBy=NONE value required by the upstream API. Item occurrence metadata is retained for duplicate-safe playlist edits.",
       "inputSchema": {
         "type": "object",
         "properties": {

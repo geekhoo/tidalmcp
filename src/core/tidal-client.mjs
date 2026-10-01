@@ -47,10 +47,25 @@ export function nextCursor(document, expectedPath) {
   const next=document?.links?.next;const href=typeof next==='string'?next:next?.href;
   if(!href)return undefined;
   try {
-    const url=new URL(href,TIDAL_API+expectedPath);
-    if(url.origin!==new URL(TIDAL_API).origin || url.pathname!==new URL(TIDAL_API+expectedPath).pathname || url.username || url.password || url.hash) return undefined;
+    if(hasUnsafePathSyntax(href))return undefined;
+    const api=new URL(TIDAL_API),apiPath=api.pathname.replace(/\/+$/,'');
+    // TIDAL JSON:API links are relative to its /v2 API base, not the host root.
+    let reference=href;
+    if(href.startsWith('/')&&!href.startsWith('//')&&href!==apiPath&&!href.startsWith(`${apiPath}/`))reference=apiPath+href;
+    const url=new URL(reference,href.startsWith('/')&&!href.startsWith('//')?api.origin+'/':TIDAL_API+expectedPath);
+    if(url.origin!==api.origin || url.pathname!==new URL(TIDAL_API+expectedPath).pathname || url.username || url.password || url.hash) return undefined;
     const cursor=url.searchParams.get('page[cursor]');return cursor && cursor.length<=8192?cursor:undefined;
   }catch{return undefined;}
+}
+function hasUnsafePathSyntax(href) {
+  let path=href;
+  const absolute=href.match(/^[A-Za-z][A-Za-z0-9+.-]*:\/\/[^/?#]*(\/[^?#]*)?/);
+  const network=href.match(/^\/\/[^/?#]*(\/[^?#]*)?/);
+  if(absolute)path=absolute[1]||'';else if(network)path=network[1]||'';
+  path=path.split(/[?#]/,1)[0];
+  if(path.includes('\\'))return true;
+  for(const segment of path.split('/')){const decoded=decodeURIComponent(segment);if(decoded==='.'||decoded==='..')return true;}
+  return false;
 }
 /** Keep JSON:API raw document intact; normalize ONLY primary linkage for the view. */
 export function normalize(document) {

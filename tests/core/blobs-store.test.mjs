@@ -4,10 +4,14 @@ import { randomBytes } from 'node:crypto';
 import { BlobsStore, BlobsAudit } from '../../src/core/blobs-store.mjs';
 import { verifyAudit } from '../../src/core/audit.mjs';
 import { AppError } from '../../src/core/util.mjs';
+import { challenge, opaque } from '../../src/core/util.mjs';
+import { OAuthBroker } from '../../src/core/oauth.mjs';
+import { fixture } from '../helpers/fixture.mjs';
 
 class MockBlobs {
   constructor() { this.map = new Map(); this.failures = 0; this.generation = 0; }
-  async getWithMetadata(key) {
+  async getWithMetadata(key, options) {
+    assert.equal(options.consistency, 'strong', 'auth and CAS reads must bypass eventual caches');
     const entry = this.map.get(key);
     return entry ? { data: entry.data, etag: entry.etag, metadata: null } : null;
   }
@@ -22,6 +26,42 @@ class MockBlobs {
   }
 }
 const key = randomBytes(32);
+
+test('consent created on one instance can be approved once on another warm instance', async () => {
+  const f = await fixture(), blobs = new MockBlobs();
+  const a = await new BlobsStore(blobs, key).load();
+  const b = await new BlobsStore(blobs, key).load();
+  const creator = new OAuthBroker({ store: a, auth: f.auth, config: f.config });
+  const consumer = new OAuthBroker({ store: b, auth: f.auth, config: f.config });
+  const client = await creator.register({ redirect_uris: f.config.redirectAllowlist });
+  const view = await creator.begin({ client_id: client.client_id, redirect_uri: client.redirect_uris[0], resource: f.config.resource, response_type: 'code', code_challenge: challenge(opaque(48)), code_challenge_method: 'S256', scope: 'tidal:read' });
+  await assert.rejects(consumer.consent(view.consentId, view.csrf, view.cookie, true), /Consent session/);
+  const approved = await b.withFreshState(() => consumer.consent(view.consentId, view.csrf, view.cookie, true));
+  assert.equal(new URL(approved.url).origin, 'https://login.tidal.com');
+  await assert.rejects(a.withFreshState(() => creator.consent(view.consentId, view.csrf, view.cookie, true)), /Consent session/);
+});
+
+test('warm requests refresh state written by another instance before synchronous reads', async () => {
+  const blobs = new MockBlobs();
+  const a = await new BlobsStore(blobs, key).load();
+  const b = await new BlobsStore(blobs, key).load();
+  await a.tx(s => { s.pending.consent = { kind: 'consent' }; });
+  await b.withFreshState(async () => {
+    assert.equal(b.read(s => s.pending.consent.kind), 'consent');
+    await b.tx(s => { delete s.pending.consent; });
+  });
+  await a.withFreshState(() => assert.equal(a.read(s => s.pending.consent), undefined));
+});
+
+test('fresh request scopes serialize and recover after a rejected handler', async () => {
+  const a = await new BlobsStore(new MockBlobs(), key).load();
+  const order = [];
+  const first = a.withFreshState(async () => { order.push('first'); await a.tx(s => { s.counter = 1; }); throw new Error('synthetic failure'); });
+  const second = a.withFreshState(() => { order.push('second'); assert.equal(a.read(s => s.counter), 1); });
+  await assert.rejects(first, /synthetic failure/);
+  await second;
+  assert.deepEqual(order, ['first', 'second']);
+});
 
 test('blobs store round-trips state through an encrypted envelope', async () => {
   const blobs = new MockBlobs();

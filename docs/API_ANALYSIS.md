@@ -8,11 +8,11 @@ TIDAL's API is JSON:API-based and requires bearer authorization. The specificati
 
 ## Implemented method/path map
 
-This table describes **the shipped allowlist**, not an exhaustive or live-verified list of TIDAL capabilities. `docs/endpoint-allowlist.json` is generated from the code and contains 43 concrete method/path patterns. In the following table, alternatives in braces are documentation shorthand, not literal endpoint syntax.
+This table describes **the shipped allowlist**, not an exhaustive or live-verified list of TIDAL capabilities. `docs/endpoint-allowlist.json` is generated from the code and contains 44 concrete method/path patterns. In the following table, alternatives in braces are documentation shorthand, not literal endpoint syntax.
 
 | Method | Path pattern | Application tool/action |
 |---|---|---|
-| GET | `/searchResults/{id}/relationships/tracks` and albums/artists/playlists/videos counterparts | `tidal_search` |
+| GET | `/searchResults` with `filter[query]`, then `/searchResults/{id}/relationships/tracks` and albums/artists/playlists/videos counterparts using the sole result's `data[0].id` | `tidal_search` |
 | GET | `/tracks/{id}`, `/albums/{id}`, `/artists/{id}`, `/playlists/{id}`, `/videos/{id}` | `tidal_get` |
 | GET | `/albums/{id}/relationships/items` or `/artists` | `tidal_related` |
 | GET | `/artists/{id}/relationships/albums` or `/tracks` | `tidal_related` |
@@ -48,6 +48,8 @@ This is intentionally not a blanket tier classification of every path under thos
 **IDs remain strings.** The adapter preserves catalogue IDs and playlist occurrence IDs separately. User tools select the linked user with `me` instead of accepting another user's ID. Path segments are encoded once, dot segments and control characters are rejected, and cursor contents are not decoded into executable URLs.
 
 **Read query parameters are closed.** Search receives a query, kind, market, explicit-content policy and optional cursor. The code uses bounded, preselected include expressions. Owned-playlist reads set the owner filter. Collection reads deliberately do not add a universal country or page-size parameter. `coverArt` is treated as a to-one relationship and rejects an input cursor.
+
+Artist-track relationship reads set the application-selected `collapseBy=NONE` value required by the upstream API. This parameter is fixed internally rather than exposed as a new tool input.
 
 **Responses retain evidence.** `items` is a convenience projection of primary data/linkage; `document` preserves the original JSON:API response. Missing includes are not invented. Duplicate playlist entries and their linkage metadata are preserved. Unknown enum values are not rejected by the output normalizer. A cursor is extracted only from a safe link to the same origin and exact current route; the next request is rebuilt from the original validated arguments.
 

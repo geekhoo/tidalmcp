@@ -4,11 +4,13 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
+      PUBLIC_ORIGIN: https://tidal.pippinpuffin.com
+      ENABLE_WRITES: "false"
       LISTEN_HOST: 0.0.0.0
       PORT: 3000
       DATA_DIR: /data
     ports:
-      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:3005:3000"
     volumes:
       - tidal-state:/data
     read_only: true
