@@ -5,7 +5,7 @@ services:
     env_file: .env
     environment:
       PUBLIC_ORIGIN: https://tidal.pippinpuffin.com
-      ENABLE_WRITES: "false"
+      ENABLE_WRITES: "true"
       LISTEN_HOST: 0.0.0.0
       PORT: 3000
       DATA_DIR: /data
