@@ -53,7 +53,7 @@ export function makeHttpHandler({config,broker,mcpHandler,audit}) {
         const header=req.headers.authorization;
         let principal;
         try {if(typeof header!=='string'||!/^Bearer [A-Za-z0-9_-]+$/.test(header))fail('invalid_token','Bearer authorization is required.',401);principal=broker.verify(header.slice(7));}
-        catch(error){res.setHeader('WWW-Authenticate',`Bearer resource_metadata="${config.origin}/.well-known/oauth-protected-resource/mcp", error="${error.code==='insufficient_scope'?'insufficient_scope':'invalid_token'}", scope="tidal:read"`);throw error;}
+        catch(error){res.setHeader('WWW-Authenticate',`Bearer resource_metadata="${config.origin}/.well-known/oauth-protected-resource/mcp", error="${error.code==='insufficient_scope'?'insufficient_scope':'invalid_token'}", scope="${config.enableWrites?'tidal:read tidal:write':'tidal:read'}"`);throw error;}
         if(req.method!=='POST'){status=405;return sendJson(res,405,{error:'method_not_allowed'},{Allow:'POST, OPTIONS'});}
         if(!String(req.headers['content-type']).toLowerCase().startsWith('application/json'))fail('invalid_request','MCP requests require application/json.',415);
         let body;try{body=JSON.parse(await requestBody(req));}catch(error){if(error instanceof AppError)throw error;fail('invalid_request','Malformed JSON.');}
