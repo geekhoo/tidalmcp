@@ -14,21 +14,31 @@ TIDAL catalogue/library MCP server with an optional MCP Apps UI. Plain Node.js E
 
 - `web/tokens.css` + `audit/design-token-map.json`: regenerated from `design-source/` by `scripts/tokens.mjs`, which runs at the start of every `npm run build`.
 - `docs/tools.json`, `docs/TOOL_REFERENCE.md`, `docs/endpoint-allowlist.json`: `npm run docs`.
-- `dist/widget.html` + `dist/widget-resource.mjs` + `dist/build-manifest.json`: build output (gitignored). The function imports `widget-resource.mjs`, so `npm run build` must run before bundling `netlify/`.
+- `dist/widget.html` + `dist/widget-resource.mjs` + `dist/build-manifest.json`: build output (gitignored). Run `npm run build` before starting production; the Dockerfile builds it during image creation. The deprecated Netlify function also imports `widget-resource.mjs`.
 - `npm run schema:refresh` downloads the TIDAL OAS into `docs/upstream/` (network).
 - Keep contracts, payload compiler/plan previews, scope checks, fixtures, negative tests and generated docs in sync when changing tools.
 
 ## Auth and state quirks
 
-- Real use needs `.env`: `cp .env.example .env`, `node scripts/keygen.mjs` for `TOKEN_ENCRYPTION_KEY`. Never commit `.env`. Tokens and OAuth callback query strings must not appear in commits, prompts, screenshots or operational logs.
+- Operating a local/self-hosted server needs `.env`: `cp .env.example .env`, `node scripts/keygen.mjs` for `TOKEN_ENCRYPTION_KEY`. Hosted MCP clients use OAuth without server `.env` or developer credentials. Never commit `.env`. Tokens and OAuth callback query strings must not appear in commits, prompts, screenshots or operational logs.
 - `DATA_DIR` (default `./var`) is single-writer: one stdio process per state directory; several simultaneous agents must share one HTTP server instead.
 - For an agent-launched stdio client use `node --env-file=/absolute/path/.env /absolute/path/src/main.mjs --stdio` — never `npm run stdio`, because npm writes non-protocol text to stdout. Set `DATA_DIR` to an absolute path in `.env`.
 - `npm run login` / `npm run logout` manage the local stdio profile (loopback callback `http://127.0.0.1:8765/callback`).
-- `ENABLE_WRITES=false` stays false unless a human explicitly approves a write test; `confirm: true` in a tool call is not human approval. Preserve duplicate occurrence IDs, exact preview digests and idempotency keys across uncertain writes; never create a replacement mutation to recover from an unknown outcome.
+- The active `tidal.pippinpuffin.com` service defaults to writes enabled at the user's request. For a separate new installation, keep `ENABLE_WRITES=false` until a human approves enabling it; `confirm: true` in a tool call is not human approval. Preserve duplicate occurrence IDs, exact preview digests and idempotency keys across uncertain writes; never create a replacement mutation to recover from an unknown outcome.
 
-## Netlify deployment (tidalmcp.netlify.app)
+## Active endpoint and client setup
 
-`netlify/functions/server.mjs` runs the same handlers as `src/main.mjs` on Netlify Functions: `src/core/web-adapter.mjs` bridges web `Request`/`Response` to the Node-style `(req,res)` surface, and `src/core/blobs-store.mjs` (`BlobsStore`/`BlobsAudit`) persists state to a site-wide Blobs store with whole-document CAS. `store.tx()` is async on every store; always `await` it. CAS rejection re-runs the transaction on fresh state; an indeterminate write outcome fails closed (`STORE_WRITE_UNKNOWN`) and must never be retried blindly. Keep writes disabled in production until a human approves them.
+Use **`https://tidal.pippinpuffin.com/mcp`** (Streamable HTTP, public-client DCR and S256 PKCE). Netlify at `tidalmcp.netlify.app` is deprecated; do not recommend it for new connections or silently fall back to it. Setup and migration: `docs/CLIENTS.md`; operating instructions: `docs/DEPLOYMENT.md`; dated live evidence: `docs/SELF_HOST_VALIDATION.md`.
+
+For Codex, use `codex mcp add tidal --url https://tidal.pippinpuffin.com/mcp --oauth-client-registration dcr`, then `codex mcp login tidal --scopes tidal:read,tidal:write --oauth-client-registration dcr`. Check URL/auth status with `codex mcp get tidal --json` and `codex mcp list --json`; restart/reopen Codex after configuration changes. The operator must approve the client's exact callback in `OAUTH_REDIRECT_ALLOWLIST`. The active service defaults to read/write authorization at the user's request; historical canary approval does not approve any new mutation. For a deliberately read-only client, request only `tidal:read`.
+
+Use actual `tidal_auth_status`/`tidal_capabilities` calls to verify current access. `/healthz` proves liveness only, and an unauthenticated `/mcp` returns 401. `/widget.html` alone does not prove MCP Apps host interaction. The user-level `~/.codex/skills/tidal-mcp/SKILL.md` contains setup and usage guidance; keep its endpoint and examples aligned when changing client instructions.
+
+## Fedora deployment and retained Netlify adapter
+
+The active service uses `src/main.mjs --http`, one Compose container and one persistent `tidal-state` volume on Fedora. `compose.yaml` maps `127.0.0.1:3005` to port `3000`; Caddy proxies the loopback port with Host matching `PUBLIC_ORIGIN=https://tidal.pippinpuffin.com`. Register `https://tidal.pippinpuffin.com/tidal/callback` with TIDAL separately from MCP client callbacks. Preserve the volume/encryption key and never use `docker compose down -v` for upgrades. The checked-in Compose override enables writes, which is the requested current default for this endpoint. For a separate new installation, explicitly set `ENABLE_WRITES: "false"` there for initial validation (editing `.env` alone does not override Compose's value).
+
+The deprecated `netlify/functions/server.mjs` adapter is retained for compatibility and historical evidence: `src/core/web-adapter.mjs` bridges web `Request`/`Response` to the Node-style `(req,res)` surface, and `src/core/blobs-store.mjs` (`BlobsStore`/`BlobsAudit`) uses whole-document CAS. `store.tx()` is async on every store; always `await` it. CAS rejection re-runs the transaction on fresh state; an indeterminate write outcome fails closed (`STORE_WRITE_UNKNOWN`) and must never be retried blindly. Keep writes disabled in a new deployment until a human approves them. Preserve dated Netlify reports as historical evidence rather than rewriting their URLs/results as Fedora evidence.
 
 ## Hard rules
 

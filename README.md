@@ -8,9 +8,9 @@ A TIDAL catalogue, saved-music and playlist integration for MCP-compatible agent
 
 The original delivery evidence remains unchanged in [audit/REPORT.md](audit/REPORT.md): dependency installation was blocked by `ENOTCACHED`, and SDK/build/live checks were unverified in that environment.
 
-The 1 October follow-up installed the pinned SDKs, retained and reviewed `package-lock.json`, built the production UI, passed the core, official SDK and Chromium gates, and deployed fixes to [tidalmcp.netlify.app](https://tidalmcp.netlify.app). Authenticated read tools and pagination were exercised against live TIDAL with writes disabled. See [LIVE_VALIDATION.md](docs/LIVE_VALIDATION.md) for exact failures, remedies and evidence.
+The active service is **[https://tidal.pippinpuffin.com/mcp](https://tidal.pippinpuffin.com/mcp)**, hosted on Fedora behind Caddy. The 1 October follow-up installed the pinned SDKs, retained and reviewed `package-lock.json`, and passed build, core, official SDK and Chromium gates. Self-host validation exercised 43 live reads, pagination, the Codex MCP Apps bridge, and a separately approved playlist creation/addition canary. See [SELF_HOST_VALIDATION.md](docs/SELF_HOST_VALIDATION.md) for evidence and limitations.
 
-The official MCP Apps bridge works in the Chromium test host. Interactive rendering in this Codex host remains unverified; resource delivery alone does not establish it. Vulnerability advisory checks and broader production certification remain outside the recorded validation.
+**Netlify is deprecated for installation and use.** [LIVE_VALIDATION.md](docs/LIVE_VALIDATION.md) preserves the earlier Netlify results; use the Fedora endpoint for new connections and migration. Recorded Codex host rendering does not guarantee every client supports MCP Apps. Vulnerability advisory checks and broader production certification remain outside the recorded validation.
 
 ## What is implemented
 
@@ -43,7 +43,39 @@ node scripts/check.mjs
 node --test tests/core/*.test.mjs
 ```
 
-## Install for real TIDAL access
+## Connect to the hosted MCP (recommended)
+
+Use `https://tidal.pippinpuffin.com/mcp` as the **Streamable HTTP** endpoint. Connecting to the hosted service does not require cloning this repository, installing Node/npm, creating a TIDAL developer app, or copying server credentials. You need a compatible OAuth MCP client and your own TIDAL account authorization.
+
+For Codex:
+
+```sh
+codex mcp add tidal --url https://tidal.pippinpuffin.com/mcp --oauth-client-registration dcr
+codex mcp login tidal --scopes tidal:read,tidal:write --oauth-client-registration dcr
+codex mcp get tidal --json
+codex mcp list --json
+```
+
+The add command may initiate login; the explicit login command requests the active service's default read/write access. Complete consent in your own browser. Check that the configured URL matches and the enabled server reports `auth_status: o_auth`. Restart or reopen Codex after adding or changing the connection so the current chat loads its tools. If `invalid_redirect_uri` appears, the service operator must allowlist the exact callback URI emitted by your client.
+
+For ChatGPT or another OAuth-capable MCP client, add the same endpoint using Streamable HTTP and public-client DCR/PKCE. Callback registration and client details are in [CLIENTS.md](docs/CLIENTS.md). `/mcp` is a protected tool endpoint; an unauthenticated browser request returning 401 is expected. `/widget.html` is a component preview and needs an MCP Apps host for interactive use.
+
+The active endpoint defaults to write-enabled access. Each mutation still needs explicit approval of its exact preview. To opt into a read-only connection, use `--scopes tidal:read` in the login command instead. If an existing token has only read permission, log in again with both scopes; refresh cannot broaden its grant.
+
+### Use the connection
+
+Start with `tidal_auth_status({})` and `tidal_capabilities({})` to inspect current connection, scopes and write policy. Try:
+
+- “Search TIDAL for Daft Punk tracks in SG and inspect one result. Don't modify anything.”
+- “Show my saved albums, then fetch the next page if one is available.”
+- “List my owned playlists and show the tracks in one I choose.”
+- “Prepare an unlisted playlist with these tracks; show me the exact preview and wait for approval before creating it.”
+
+The tools return structured JSON/text even without an MCP Apps view. Reuse returned item IDs and cursors. Library changes require write scopes plus explicit approval of the exact `tidal_prepare_change` preview before `tidal_commit_change`; server write enablement alone is not approval. See [TOOL_REFERENCE.md](docs/TOOL_REFERENCE.md) and [CLIENTS.md](docs/CLIENTS.md) for examples and migration from Netlify.
+
+The Codex `tidal-mcp` skill (`~/.codex/skills/tidal-mcp/SKILL.md`), when installed, guides endpoint setup, discovery, pagination and approved changes. Invoke it with `$tidal-mcp`; installing the skill does not itself authenticate the MCP connection.
+
+## Install your own server for real TIDAL access
 
 Obtain a TIDAL developer application, the required approved scopes, and the exact redirect URI registrations. Access still depends on your application's tier, account permissions, territory and TIDAL approval. `SG` is a configurable default market, not an assertion of catalogue or service availability there.
 
@@ -73,13 +105,13 @@ Open the printed URL in your browser, complete TIDAL consent, then configure the
 
 One state directory has one writer. For several simultaneous agents, run one HTTP server and connect each agent to it; do not launch several stdio processes against the same directory.
 
-### Remote ChatGPT / Codex / other MCP clients
+### Operate your own remote HTTP server
 
-Set `PUBLIC_ORIGIN=https://music.example.com`, configure `OAUTH_REDIRECT_ALLOWLIST` with the **exact agent callback URI**, register `https://music.example.com/tidal/callback` in TIDAL, and start `npm start` behind HTTPS. The MCP endpoint is `https://music.example.com/mcp`.
+For the existing Fedora service, `PUBLIC_ORIGIN=https://tidal.pippinpuffin.com` and the TIDAL callback is `https://tidal.pippinpuffin.com/tidal/callback`. For a separate installation, substitute your own HTTPS domain, configure `OAUTH_REDIRECT_ALLOWLIST` with the **exact agent callback URI**, register your domain's `/tidal/callback` in TIDAL, and start `npm start` behind HTTPS. The MCP endpoint is your origin plus `/mcp`.
 
 The TIDAL callback and the agent callback are different URLs with different owners. Follow [AUTH.md](docs/AUTH.md), [CLIENTS.md](docs/CLIENTS.md), and [DEPLOYMENT.md](docs/DEPLOYMENT.md). This package advertises DCR/public-client PKCE, not CIMD or client-secret authentication for agents.
 
-### Enable writes deliberately
+### Enable writes on your own server
 
 Leave `ENABLE_WRITES=false` for initial validation. To enable changes, set it to `true`, restart, and reauthorize with MCP `tidal:write` plus the required TIDAL write scopes. The host must still obtain explicit approval of the exact preview. A `confirm: true` argument alone is not cryptographic evidence of a human click.
 

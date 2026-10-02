@@ -1,13 +1,17 @@
 # Deployment and operations
 
+## Active service
+
+Use **`https://tidal.pippinpuffin.com/mcp`** for client installation and usage; see [CLIENTS.md](CLIENTS.md). The active service defaults to write-enabled access and client authorization with `tidal:read,tidal:write`; exact-preview approval remains mandatory for each mutation. The active service is a single Docker Compose container on Fedora at `/home/geek/tidal-mcp-app`, behind Caddy. Netlify at `tidalmcp.netlify.app` is deprecated for new connections and deployment. Its adapter remains in source for compatibility and historical evidence.
+
 ## Intended topology
 
 Run one Node process behind an HTTPS reverse proxy, with one persistent private state directory and a separately managed encryption key. Bind the backend to loopback or a private container network. Do not expose its plain HTTP port publicly. `PUBLIC_ORIGIN` is an origin only: no path, query, credentials or fragment. The MCP resource is always that origin plus `/mcp`.
 
-Example private `.env` values:
+Example private `.env` values for a separate new installation (substitute its domain; the active service keeps writes enabled):
 
 ```dotenv
-PUBLIC_ORIGIN=https://music.example.com
+PUBLIC_ORIGIN=https://tidal.pippinpuffin.com
 LISTEN_HOST=127.0.0.1
 PORT=3000
 DATA_DIR=/srv/tidal-mcp/private-state
@@ -29,30 +33,42 @@ npm audit --omit=dev --audit-level=high
 npm start
 ```
 
-The first successful online install must produce a reviewed `package-lock.json`; commit it privately/publicly as appropriate and use `npm ci` on subsequent reproducible builds. The delivery environment could not create a genuine lockfile. Direct version pins alone do not pin transitive dependencies. Current runtime/container security patches and an image digest must be reviewed before deployment.
+The first successful online install must produce a reviewed `package-lock.json`; commit it privately/publicly as appropriate and use `npm ci` on subsequent reproducible builds. The original delivery environment could not create a genuine lockfile; the 1 October follow-up retained and reviewed one. See [SELF_HOST_VALIDATION.md](SELF_HOST_VALIDATION.md) for subsequent execution evidence. Direct version pins alone do not pin transitive dependencies. Current runtime/container security patches and an image digest must be reviewed before deployment.
 
-The supplied Dockerfile builds the UI, prunes development packages and runs as a non-root user. `compose.yaml` binds port 3000 only to host loopback, drops Linux capabilities and uses a named state volume. Set a real HTTPS `PUBLIC_ORIGIN` before using that compose file; combining its container bind address with a loopback public origin intentionally fails validation. Docker and reverse-proxy execution were not tested in the delivery environment.
+The supplied Dockerfile builds the UI, prunes development packages and runs as a non-root user. `compose.yaml` maps container port 3000 to host-loopback port 3005, drops Linux capabilities and uses a named state volume. Set a real HTTPS `PUBLIC_ORIGIN` before using that compose file; combining its container bind address with a loopback public origin intentionally fails validation. The original delivery environment did not test Docker/proxy execution; subsequent Fedora execution is recorded in [SELF_HOST_VALIDATION.md](SELF_HOST_VALIDATION.md).
 
-## Netlify production
+## Fedora Compose operations
 
-Netlify uses the official web-standard MCP transport after the shared HTTP authorization and body checks. Build the widget before function bundling, then deploy the verified output:
+Keep the existing endpoint write-enabled as requested. For a separate new installation, configure protected `.env` credentials/key and exact callbacks before startup. Set `ENABLE_WRITES: "false"` in `compose.yaml` for initial validation: its checked-in `"true"` override reflects a prior approved canary and takes precedence over `.env`. Do not copy that approval to another account or write workflow.
+
+On the Fedora host, from `/home/geek/tidal-mcp-app`:
 
 ```sh
-npm run verify
-npm run test:browser
-netlify deploy --prod --site e9643e19-7112-41d0-85b3-4befb549a972 --no-build --json
+docker compose config -q
+docker compose up -d --build
+docker compose ps
+curl --fail --silent --show-error -H 'Host: tidal.pippinpuffin.com' http://127.0.0.1:3005/healthz
+curl --fail --silent --show-error https://tidal.pippinpuffin.com/healthz
+curl --fail --silent --show-error https://tidal.pippinpuffin.com/.well-known/oauth-protected-resource/mcp
+curl --fail --silent --show-error https://tidal.pippinpuffin.com/.well-known/oauth-authorization-server
 ```
 
-With Netlify CLI 27.10.2, `--context` requires `--build`; it cannot be combined with `--no-build`. Confirm the published deployment is ready, then test authenticated MCP tools. `/healthz` alone is not acceptance evidence. Keep `ENABLE_WRITES=false` and verify `tidal_auth_status.writesEnabled` before live reads.
+Use SSH to run these commands on Fedora when operating from another machine. The commands upgrade this Compose service; retain its named `tidal-state` volume and encryption key. Do not use `down -v` or globally prune/restart co-hosted services. Confirm Caddy preserves the configured Host and OAuth/MCP headers. Then test the authenticated client with `tidal_auth_status` and `tidal_capabilities` and a read-only search. Health/discovery alone are not live TIDAL acceptance.
 
-The deployed `/widget.html` is a host-bridge component. Opening it as an ordinary browser page displays the host-required warning. A successful UI-resource read proves resource delivery; interactive host compatibility requires a real MCP Apps host rendering the resource and servicing a read action. See the separate follow-up [live validation report](LIVE_VALIDATION.md).
+`/widget.html` is a host-bridge component. An ordinary browser page displays the host-required warning. Resource delivery does not establish interactive compatibility; validate a real MCP Apps host read action or use text/JSON tools. See [SELF_HOST_VALIDATION.md](SELF_HOST_VALIDATION.md) for the recorded Fedora/Codex result.
+
+## Deprecated Netlify adapter
+
+Do not use Netlify for a new installation or as an automatic fallback. [LIVE_VALIDATION.md](LIVE_VALIDATION.md), [MCP_USAGE_AND_UI.md](MCP_USAGE_AND_UI.md), and [OAUTH_DISCOVERY_INCIDENT.md](OAUTH_DISCOVERY_INCIDENT.md) retain dated Netlify evidence. Their URLs/results describe the original observations, not the active service. Client migration is documented in [CLIENTS.md](CLIENTS.md); changing a URL does not migrate encrypted server state or make tokens portable between protected resources.
+
+The retained function uses the web-standard MCP transport with the shared HTTP authorization/body checks. It requires a built widget before function bundling and uses encrypted Blobs state with strong reads and whole-document CAS. Retain these invariants when maintaining the deprecated adapter.
 
 ## Caddy example
 
 ```caddyfile
-music.example.com {
+tidal.pippinpuffin.com {
     reverse_proxy 127.0.0.1:3005 {
-        header_up Host music.example.com
+        header_up Host tidal.pippinpuffin.com
     }
 }
 ```
@@ -71,7 +87,7 @@ The broker caps active registrations and pending requests and rate-limits author
 
 ## State backup, restore and key rotation
 
-On Netlify, the warm runtime refreshes its encrypted Blobs state with strong consistency before each request. Requests within one function instance are serialized to protect synchronous state reads; cross-instance writes retain whole-document CAS. This adds a storage read per request and favors correctness over throughput. Strong consistency alone does not refresh an already loaded in-memory snapshot.
+In the deprecated Netlify adapter, the warm runtime refreshes its encrypted Blobs state with strong consistency before each request. Requests within one function instance are serialized to protect synchronous state reads; cross-instance writes retain whole-document CAS. This adds a storage read per request and favors correctness over throughput. Strong consistency alone does not refresh an already loaded in-memory snapshot.
 
 The consent page permits form redirects to TIDAL's login origin and configured client callback origins. Chromium checks redirects against `form-action`, so restricting it to `self` prevents the login redirect after a successful, single-use consent submission. Restart authorization from the MCP client after a failed or expired flow; resubmitting consumed consent returns HTTP 400.
 

@@ -10,10 +10,12 @@ The server advertises public-client DCR with `token_endpoint_auth_method=none` a
 
 | URL | Registered/used by | Purpose |
 |---|---|---|
-| `https://music.example.com/mcp` | MCP client | Protected resource and tool endpoint |
-| `https://music.example.com/tidal/callback` | TIDAL developer app | Returns the upstream TIDAL authorization code to this server |
+| `https://tidal.pippinpuffin.com/mcp` | MCP client | Protected resource and tool endpoint |
+| `https://tidal.pippinpuffin.com/tidal/callback` | TIDAL developer app | Returns the upstream TIDAL authorization code to this server |
 | The agent's exact callback URI | `OAUTH_REDIRECT_ALLOWLIST`, then DCR | Returns this server's own authorization code to the agent |
 | `http://127.0.0.1:8765/callback` | TIDAL app, for local login where permitted | Bootstraps a local stdio profile |
+
+These are the active Fedora service URLs; substitute your own origin for a separate installation. Netlify is deprecated for new connections. Hosted clients use OAuth without handling the server's developer credentials; see [CLIENTS.md](CLIENTS.md) for setup and migration.
 
 Do not register the MCP endpoint as the TIDAL callback. Do not put a ChatGPT/Codex callback in the TIDAL developer app. Do not wildcard callbacks. Each DCR client may register one to five exact operator-approved URIs. The authorization request and code exchange must use the registered URI verbatim. Existing registrations are retained across restart.
 
@@ -45,6 +47,8 @@ All direct HTTPS upstream calls have fixed destinations and reject redirects. Br
 These are this application's policy choices except where an upstream response controls expiry. They are not universal TIDAL or MCP defaults.
 
 ## Scopes and elevation
+
+The active `tidal.pippinpuffin.com` endpoint defaults to writes enabled and client login with `tidal:read,tidal:write`. A deliberately read-only client can request only `tidal:read`; every mutation still needs exact-preview approval.
 
 MCP `tidal:read` maps to the account's read workflows. The TIDAL authorization request contains `user.read`, `collection.read`, `playlists.read` and `search.read`. MCP `tidal:write` is advertised only when the operator enables writes and requests `collection.write` and `playlists.write` upstream. The tool that actually performs an operation still checks its required scope. Legacy/internal scope names are not requested just because they appear in a published schema security array.
 

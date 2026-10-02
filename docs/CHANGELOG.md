@@ -1,5 +1,9 @@
 # Change record
 
+## Documentation and skill update — 2026-10-02
+
+Made `https://tidal.pippinpuffin.com/mcp` the default hosted installation/usage endpoint and deprecated Netlify. Added Codex DCR/read-write setup, OAuth checks, connection migration, read prompts, Fedora operations and the Compose write-override caveat. Updated the installed user-level `tidal-mcp` skill with matching setup and migration guidance. Historical audit/Netlify reports and runtime configuration are unchanged.
+
 ## Source delivery 1.0.0 — 2026-09-30
 
 Implemented separate MCP/TIDAL authorization, official SDK adapters, strict tool contracts, catalogue/user workflows, guarded mutation plans, encrypted single-writer state, audit chain, optional semantic-token UI and fictional demo. Added core, HTTP, persistence, SDK and browser test sources and operator documentation.

@@ -10,6 +10,8 @@
 | OAuth `invalid_redirect_uri` | Copy the client's actual complete callback into the operator allowlist. Register the separate server `/tidal/callback` in TIDAL. No wildcards. |
 | OAuth `invalid_client` | Retain registered client/state; select DCR with public-client `none`. CIMD, Basic agent client auth and private-key JWT are not implemented. |
 | Consent rejected | Submit from the same browser/origin before expiry. Do not copy state/callback into another browser or agent. Start a fresh flow after denial/expiry. |
+| Client still points at Netlify | Change the existing connection URL to `https://tidal.pippinpuffin.com/mcp`, complete OAuth if needed, and restart/reopen the host. See CLIENTS.md; do not disconnect the account to migrate. |
+| Codex authenticates but this chat has no TIDAL tools | Verify URL/auth status with `codex mcp get tidal --json` / `codex mcp list --json`, then restart/reopen Codex. CLI configuration alone is not callable-tool evidence. |
 | `/mcp` 401 | The bearer must be a valid locally issued MCP token, not a TIDAL token. Follow discovery/reauthorization. |
 | `/mcp` 421 / Origin rejected | Preserve the configured Host through the proxy and use exact allowed Origins. Do not trust arbitrary forwarded headers or disable the checks. |
 | TIDAL 403 | Check approved scopes, access tier, account/resource permission and market. Repeated token refresh is not an entitlement fix. |
