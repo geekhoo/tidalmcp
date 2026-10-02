@@ -5,13 +5,13 @@ import { httpServer } from './core/http.mjs';
 import { publicError } from './core/util.mjs';
 let runtime;
 try {
-  const [{createMcpServer},{sdkSend}]=await Promise.all([import('./mcp/server.mjs'),import('./adapters/tidal-sdk.mjs')]);
+  const [{createMcpServer,connectServer},{sdkSend}]=await Promise.all([import('./mcp/server.mjs'),import('./adapters/tidal-sdk.mjs')]);
   runtime=await makeRuntime({send:sdkSend});
   const widgetHtml=await readFile(new URL('../dist/widget.html',import.meta.url),'utf8');
   if(process.argv.includes('--stdio')) {
     const {StdioServerTransport}=await import('@modelcontextprotocol/server/stdio');
     const server=createMcpServer({service:runtime.service,getPrincipal:runtime.localPrincipal,local:true,widgetHtml,config:runtime.config});
-    await server.connect(new StdioServerTransport());
+    await connectServer(server,new StdioServerTransport());
     process.stdin.on('end',()=>{server.close().finally(()=>runtime.close());});
     for(const signal of ['SIGINT','SIGTERM'])process.once(signal,()=>{server.close().finally(()=>{runtime.close();process.exit(0);});});
   } else {

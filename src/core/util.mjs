@@ -20,6 +20,19 @@ export function canonical(value) {
   if (value && typeof value === 'object') return '{' + Object.keys(value).sort().map(k => JSON.stringify(k) + ':' + canonical(value[k])).join(',') + '}';
   return JSON.stringify(value);
 }
+// Some MCP hosts marshal union-typed tool arguments as JSON strings before
+// validation. Parse a stringified `change` at ingress so the unchanged strict
+// schemas still see the intended object; malformed strings stay for rejection.
+export function normalizeRpcMessage(message) {
+  const fix = m => {
+    const args = m?.params?.arguments;
+    if (m?.method === 'tools/call' && args && typeof args === 'object' && typeof args.change === 'string') {
+      try { m.params = { ...m.params, arguments: { ...args, change: JSON.parse(args.change) } }; } catch {}
+    }
+    return m;
+  };
+  return Array.isArray(message) ? message.map(fix) : fix(message);
+}
 export function publicError(error) {
   if (error instanceof AppError) return { code: error.code, message: error.message, ...(error.details ? { details: error.details } : {}) };
   return { code: 'INTERNAL_ERROR', message: 'The operation failed. Use the audit request ID for diagnosis; no credentials were returned.' };

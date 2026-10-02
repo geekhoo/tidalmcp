@@ -1,5 +1,5 @@
 import { createServer } from 'node:http';
-import { AppError, fail, opaque, escapeHtml, publicError } from './util.mjs';
+import { AppError, fail, opaque, escapeHtml, publicError, normalizeRpcMessage } from './util.mjs';
 import { TIDAL_AUTHORIZE_URL } from './upstream-auth.mjs';
 const MAX_BODY=131072;
 export async function requestBody(req) {
@@ -57,7 +57,7 @@ export function makeHttpHandler({config,broker,mcpHandler,audit}) {
         if(req.method!=='POST'){status=405;return sendJson(res,405,{error:'method_not_allowed'},{Allow:'POST, OPTIONS'});}
         if(!String(req.headers['content-type']).toLowerCase().startsWith('application/json'))fail('invalid_request','MCP requests require application/json.',415);
         let body;try{body=JSON.parse(await requestBody(req));}catch(error){if(error instanceof AppError)throw error;fail('invalid_request','Malformed JSON.');}
-        await mcpHandler(req,res,body,principal);status=res.statusCode;return;
+        await mcpHandler(req,res,normalizeRpcMessage(body),principal);status=res.statusCode;return;
       }
       const metadataRoutes=['/.well-known/oauth-protected-resource','/.well-known/oauth-protected-resource/mcp'];
       if(metadataRoutes.includes(route)&&req.method==='GET'){status=200;return sendJson(res,200,broker.resourceMetadata());}

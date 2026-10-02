@@ -1,5 +1,9 @@
 # Change record
 
+## Ingress tolerance for stringified change payloads — 2026-10-03
+
+Some MCP hosts marshal union-typed tool arguments as JSON strings before validation, which strict tool schemas reject. JSON-RPC ingress (native HTTP, Netlify and stdio) now parses a stringified `change` argument before SDK validation; malformed strings are still rejected. Tool schemas, contracts and the advertised tool surface are unchanged.
+
 ## Documentation and skill update — 2026-10-02
 
 Made `https://tidal.pippinpuffin.com/mcp` the default hosted installation/usage endpoint and deprecated Netlify. Added Codex DCR/read-write setup, OAuth checks, connection migration, read prompts, Fedora operations and the Compose write-override caveat. Updated the installed user-level `tidal-mcp` skill with matching setup and migration guidance. Historical audit/Netlify reports and runtime configuration are unchanged.
