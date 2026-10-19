@@ -112,6 +112,7 @@ export class OAuthBroker {
     if(typeof raw!=='string'||raw.length>8192)fail('invalid_token','Missing or invalid bearer token.',401);
     const access=this.store.read(s=>s.access[sha256(raw)]),family=access&&this.store.read(s=>s.families[access.familyId]);
     if(!access||!family||family.revoked||access.expiresAt<=this.now()||family.expiresAt<=this.now()||access.resource!==this.config.resource)fail('invalid_token','Token is expired, revoked or intended for another resource.',401);
+    if(family.kind==='agent-token'&&!this.config.enableAgentTokens)fail('invalid_token','Agent tokens are disabled by the operator.',401);
     const grant=this.auth.grant(access.grantId);
     if(!grant||grant.disabled)fail('invalid_token','TIDAL account grant is disconnected.',401);
     if(!access.scopes.includes('tidal:read'))fail('insufficient_scope','tidal:read is required.',403);

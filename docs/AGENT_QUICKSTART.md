@@ -2,6 +2,8 @@
 
 Copy either prompt into your AI agent. Each user authorizes their own TIDAL account. Hosted access requires a compatible MCP client; it does not require installing this repository. Detailed client configuration: [CLIENTS.md](CLIENTS.md).
 
+For agents explicitly sharing the operator's TIDAL account, use a separate [operator-issued bearer token](BEARER_TOKENS.md) per agent instead of the OAuth setup prompt. The access-check prompt below works for either connection mode.
+
 ## 1. Connection setup prompt
 
 ```text

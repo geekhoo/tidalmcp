@@ -28,7 +28,7 @@ The server can verify that a commit matches a prepared payload and a permitted a
 
 ## Secure defaults and deliberate gaps
 
-The server does not expose an unauthenticated production music proxy. HTTP requires MCP OAuth, including for catalogue tools; stdio trusts its local process environment. Writes require operator opt-in, a write-capable MCP principal, an available TIDAL grant and the operation's upstream scope. An upstream refresh may happen for a read, but writes are not automatically repeated after failure. Tokens do not appear in tool results, resources or browser state.
+The server does not expose an unauthenticated production music proxy. HTTP requires a verified MCP bearer token (OAuth-issued or an explicitly enabled [operator-issued agent token](BEARER_TOKENS.md)), including for catalogue tools; stdio trusts its local process environment. Writes require operator opt-in, a write-capable MCP principal, an available TIDAL grant and the operation's upstream scope. An upstream refresh may happen for a read, but writes are not automatically repeated after failure. Tokens do not appear in tool results, resources or browser state.
 
 The custom authorization server supports the chosen public-client DCR flow only. It does not implement enterprise OIDC claims, CIMD fetching, private-key JWT validation, machine-to-machine agent grants or external IdP integration. These omissions are advertised honestly and avoid unused network/parser surfaces. An independent OAuth review or migration to an established provider is required before an internet-facing service with many users.
 

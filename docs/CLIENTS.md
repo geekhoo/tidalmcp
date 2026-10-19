@@ -2,6 +2,8 @@
 
 For distributable setup and Dot access-check prompts plus example requests, see [Agent quick start](AGENT_QUICKSTART.md).
 
+For agents using the operator's shared TIDAL account with separately revocable credentials, see [Per-agent bearer tokens](BEARER_TOKENS.md). Clients supporting this mode send an operator-provisioned token in `Authorization: Bearer`; OAuth setup below remains available.
+
 ## Compatibility contract
 
 The active hosted endpoint is **`https://tidal.pippinpuffin.com/mcp`**. `https://tidalmcp.netlify.app/mcp` is deprecated; use the migration steps below for an existing connection. Hosted clients need no repository clone, Node/npm install, server `.env`, or TIDAL developer credentials.

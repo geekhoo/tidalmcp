@@ -24,5 +24,5 @@ export function config(env = process.env) {
   if (widgetDomain && (new URL(widgetDomain).origin!==widgetDomain || !widgetDomain.startsWith('https://'))) fail('CONFIG_ERROR','WIDGET_DOMAIN must be an HTTPS origin.',500);
   const host = env.LISTEN_HOST || '127.0.0.1';
   if (local && !['127.0.0.1','localhost','::1'].includes(host)) fail('CONFIG_ERROR','Loopback PUBLIC_ORIGIN cannot be combined with a public bind address.',500);
-  return Object.freeze({port,host,origin:origin.origin,resource:origin.origin+'/mcp',callback:origin.origin+'/tidal/callback',local,clientId:env.TIDAL_CLIENT_ID,clientSecret:env.TIDAL_CLIENT_SECRET || '',key,dataDir:path.resolve(env.DATA_DIR || './var'),country,enableWrites:env.ENABLE_WRITES==='true',redirectAllowlist,allowedOrigins,widgetDomain,profile:env.LOCAL_PROFILE || 'local'});
+  return Object.freeze({port,host,origin:origin.origin,resource:origin.origin+'/mcp',callback:origin.origin+'/tidal/callback',local,clientId:env.TIDAL_CLIENT_ID,clientSecret:env.TIDAL_CLIENT_SECRET || '',key,dataDir:path.resolve(env.DATA_DIR || './var'),country,enableWrites:env.ENABLE_WRITES==='true',enableAgentTokens:env.ENABLE_AGENT_TOKENS==='true',redirectAllowlist,allowedOrigins,widgetDomain,profile:env.LOCAL_PROFILE || 'local'});
 }

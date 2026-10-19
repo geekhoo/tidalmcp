@@ -6,6 +6,7 @@ services:
     environment:
       PUBLIC_ORIGIN: https://tidal.pippinpuffin.com
       ENABLE_WRITES: "true"
+      ENABLE_AGENT_TOKENS: "true"
       LISTEN_HOST: 0.0.0.0
       PORT: 3000
       DATA_DIR: /data

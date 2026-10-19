@@ -4,7 +4,7 @@
 
 The **MCP token** authorizes an agent to this server. The **TIDAL token** authorizes this server to TIDAL. They are never interchangeable. Passing a TIDAL token as the `/mcp` bearer token fails local verification. MCP tokens contain no TIDAL credentials and are stored only as hashes in token lookup tables; the backing state file is itself encrypted.
 
-The server advertises public-client DCR with `token_endpoint_auth_method=none` and S256 PKCE. It does not advertise CIMD, private-key JWT client authentication, OIDC ID tokens, UserInfo, password grants, agent client-credentials grants or custom API-key login. A client requiring one of those unsupported features needs a compatible configuration or a different authorization front end.
+The server advertises public-client DCR with `token_endpoint_auth_method=none` and S256 PKCE. It does not advertise CIMD, private-key JWT client authentication, OIDC ID tokens, UserInfo, password grants or agent client-credentials grants. An optional operator CLI can issue [per-agent bearer tokens](BEARER_TOKENS.md) bound to an already-linked TIDAL grant; this is a separate provisioning mechanism, not a new OAuth grant or public token-issuing endpoint.
 
 ## Exact URLs and registration
 

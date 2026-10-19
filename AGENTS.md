@@ -32,6 +32,7 @@ TIDAL catalogue/library MCP server with an optional MCP Apps UI. Plain Node.js E
 - `DATA_DIR` (default `./var`) is single-writer: one stdio process per state directory; several simultaneous agents must share one HTTP server instead.
 - For an agent-launched stdio client use `node --env-file=/absolute/path/.env /absolute/path/src/main.mjs --stdio` — never `npm run stdio`, because npm writes non-protocol text to stdout. Set `DATA_DIR` to an absolute path in `.env`.
 - `npm run login` / `npm run logout` manage the local stdio profile (loopback callback `http://127.0.0.1:8765/callback`).
+- Operator-issued per-agent bearer tokens are managed by `scripts/agent-token.mjs`, gated by `ENABLE_AGENT_TOKENS`. They reuse hashed access/family records bound to an existing TIDAL grant; see `docs/BEARER_TOKENS.md`. Stop the owning server before running this CLI. Never expose its private output file contents. Rotation retains client identity and preview ownership; disconnecting the shared grant invalidates all linked agents.
 - The active `tidal.pippinpuffin.com` service defaults to writes enabled at the user's request. For a separate new installation, keep `ENABLE_WRITES=false` until a human approves enabling it; `confirm: true` in a tool call is not human approval. Preserve duplicate occurrence IDs, exact preview digests and idempotency keys across uncertain writes; never create a replacement mutation to recover from an unknown outcome.
 
 ## Active endpoint and client setup
