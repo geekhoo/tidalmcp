@@ -4,7 +4,8 @@ Reviewed 30 September 2026. These are references used to select and inspect cont
 
 | Reference | Use |
 |---|---|
-| https://tidal-music.github.io/tidal-sdk-web/index.html | User-supplied official Web SDK entry point |
+| https://tidal-music.github.io/tidal-sdk-web/ | User-supplied official Web SDK documentation; reference saved 19 October 2026 |
+| https://github.com/tidal-music/tidal-sdk-web | User-supplied official Web SDK source repository; reference saved 19 October 2026 |
 | https://tidal-music.github.io/tidal-api-reference/tidal-api-oas.json | Published OpenAPI, reported 3.0.1 / API 1.10.91; method/tier/contract review |
 | https://developer.tidal.com/documentation/api-sdk/api-sdk-authorization | Official authorization guidance |
 | https://github.com/tidal-music/tidal-sdk-web/blob/main/packages/api/package.json | API SDK package metadata, declared version 0.47.0 |
