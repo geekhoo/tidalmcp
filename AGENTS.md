@@ -2,11 +2,19 @@
 
 TIDAL catalogue/library MCP server with an optional MCP Apps UI. Plain Node.js ESM (`.mjs`, no framework, no compile step) targeting Node >= 22.16. Read `README.md`, `SPEC.md` (acceptance contract), `audit/REPORT.md` and relevant `docs/` before changing behavior. Tests with synthetic upstreams are core evidence, not proof of SDK or live-service compatibility.
 
+## Code and evidence map
+
+- `src/main.mjs` wires production transports; `src/runtime.mjs` composes authentication, storage, client, plans and service. HTTP creates a fresh MCP server/transport per authenticated request; it uses stateless POST/JSON (`GET` and `DELETE /mcp` return 405).
+- `src/core/contracts.mjs` owns tool inputs and mutation payload compilation; `schema.mjs` validates descriptors and converts them to Zod; `service.mjs` dispatches tools; `plans.mjs` owns preview/commit recovery. `tidal-client.mjs` owns upstream policy, while `src/adapters/tidal-sdk.mjs` owns official SDK calls with SDK retries disabled.
+- `src/mcp/server.mjs` registers tools/resources. `web/embedded.mjs` connects the official host bridge and `web/ui.mjs` renders the component. See `docs/ARCHITECTURE.md` and `docs/DATA_CONTRACTS.md` before crossing these boundaries.
+- `SPEC.md`, `audit/REPORT.md` and the delivery tables in `docs/TESTING.md` retain the original delivery baseline. `README.md` and dated `docs/SELF_HOST_VALIDATION.md` record follow-up validation; neither historical result proves the current checkout or live service passed today.
+- `docs/spec-001-chatgpt-music-discovery/` is a conditional proposal, not implemented functionality. Preserve its recorded permission/eligibility gates when planning that feature; the root `SPEC.md` remains the baseline contract.
+
 ## Commands
 
 - CI gate: `npm run verify` = `check` → `build` → `test` → `test:mcp`, then `test:browser` (needs `npx playwright install chromium` first).
 - `npm run check` is the only lint: `node --check` syntax over every `.mjs` plus CSS-variable resolution. There is no ESLint or `tsc`; it does not validate SDK imports or types (`types/contracts.d.ts` is hand-maintained, not compiled).
-- Tests are separate evidence classes (see `docs/TESTING.md`): `npm test` (77 core tests, dependency-free, synthetic upstream), `npm run test:mcp` (real official MCP/TIDAL SDKs over stdio — missing packages fail the run, they never skip), `npm run test:browser`, `npm run test:coverage`, `python tests/browser/run.py` (alternate Python harness, own loopback on 3017; `CHROMIUM_EXECUTABLE` reuses an installed browser).
+- Tests are separate evidence classes (see `docs/TESTING.md`): `npm test` (dependency-free core tests, synthetic upstream), `npm run test:mcp` (official SDK stdio protocol, TIDAL serialization and retained Netlify transport tests — missing packages fail the run, they never skip), `npm run test:browser`, `npm run test:coverage`, `python tests/browser/run.py` (alternate Python harness, own loopback on 3017; `CHROMIUM_EXECUTABLE` reuses an installed browser). Quote counts from the actual run rather than historical delivery tables.
 - Single test file: `node --test tests/core/<name>.test.mjs` (Node's built-in runner; no vitest/jest).
 - Credential-free demo: `node scripts/demo.mjs` → http://127.0.0.1:3010 with fictional in-memory data. The production entry (`src/main.mjs`) never falls back to it.
 
@@ -45,5 +53,5 @@ The deprecated `netlify/functions/server.mjs` adapter is retained for compatibil
 - Use the official SDK boundaries (MCP SDK v2, MCP Apps, TIDAL API SDK); never replace them with handwritten MCP JSON-RPC.
 - Do not add undocumented/internal TIDAL routes, arbitrary URL/header tools, audio download, DRM or lyrics features, or credentials in UI/tool output. The adapter is a curated allowlist (44 bindings in `docs/endpoint-allowlist.json`), not the full API.
 - Never alter `audit/` results to imply a blocked check passed. Blocked commands are recorded honestly; delivery manifests are refreshed only as a new release artifact — do not rewrite historical evidence.
-- `package-lock.json` was absent from the reviewed delivery; keep the one `npm install` generates and review it before release (CI falls back to `npm install` with a warning when it is missing).
+- `package-lock.json` is tracked; preserve it and use `npm ci` for reproducible installs. Review intentional dependency/lockfile changes before release. The original delivery lacked a lockfile; CI retains an `npm install` fallback with a warning if it is missing.
 - npm 11+ may warn that esbuild's postinstall script was blocked; the build still works (the platform binary ships via the `@esbuild/*` optional dependency).
