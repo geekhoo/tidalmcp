@@ -19,7 +19,19 @@ This implementation is an operator-provisioned credential extension alongside OA
 
 ## Operator management
 
-Use `scripts/agent-token.mjs` with the deployment environment loaded. It supports `grants`, `list`, `create`, `rotate` and `revoke`. `grants` lists safe account references and subject hashes; it does not print upstream tokens or profile attributes. `list` prints token metadata, never secrets.
+Use `npm run access-tokens -- --help` for the CLI. It loads `.env` when present and supports `grants`, `list`, `create`, `rotate`, `revoke` and `delete`. `grants` lists safe account references and subject hashes; it does not print upstream tokens or profile attributes. `list` prints token metadata, never secrets.
+
+For a local installation, stop the owning server, then run:
+
+```sh
+npm run access-tokens -- grants
+npm run access-tokens -- list
+npm run access-tokens -- create --grant ACTUAL_GRANT_ID --name my-agent --scopes tidal:read,tidal:write --out /absolute/private/my-agent.token
+npm run access-tokens -- revoke ACTUAL_TOKEN_ID
+npm run access-tokens -- delete ACTUAL_TOKEN_ID
+```
+
+Use the ID returned by `create` or `list`, not the secret. `revoke` disables the credential while retaining its list entry. `delete` also removes its stored credential records and list entry, immediately invalidating an active token. Both preserve linked accounts, music, audit history and mutation recovery records. Neither deletes private delivery files; remove those separately when no longer needed. The older `--id ID` syntax remains supported. Restart the owning server after management.
 
 **Stop the owning server before running this CLI.** The encrypted state directory is single-writer; do not remove its writer lock to force access. The CLI must use the same state directory, encryption key and public origin as the HTTP service. It performs no upstream requests and does not initiate TIDAL login.
 

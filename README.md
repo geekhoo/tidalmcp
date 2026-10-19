@@ -115,6 +115,33 @@ The TIDAL callback and the agent callback are different URLs with different owne
 
 Leave `ENABLE_WRITES=false` for initial validation. To enable changes, set it to `true`, restart, and reauthorize with MCP `tidal:write` plus the required TIDAL write scopes. The host must still obtain explicit approval of the exact preview. A `confirm: true` argument alone is not cryptographic evidence of a human click.
 
+## Manage agent access tokens
+
+Use one bearer token per agent sharing your linked TIDAL account. The CLI loads `.env` when present; use the server's state directory, encryption key and public origin. **Stop the owning server before managing tokens**, then restart it afterward.
+
+```sh
+npm run access-tokens -- --help
+npm run access-tokens -- grants
+npm run access-tokens -- list
+npm run access-tokens -- create --grant GRANT_ID --name my-agent --scopes tidal:read,tidal:write --days 30 --out /absolute/private/my-agent.token
+npm run access-tokens -- revoke TOKEN_ID
+npm run access-tokens -- delete TOKEN_ID
+```
+
+Use an account ID from `grants` and a token ID from `create` or `list`. `revoke` disables a token and keeps its list entry; `delete` disables it and removes the entry. Neither changes music, disconnects the account or deletes private delivery files. New secrets are written only to a new private file, never printed. `--out` must be an absolute path in an existing writable directory; use a Windows absolute path when running locally on Windows.
+
+On the active Fedora deployment, run the CLI inside Compose so it uses the correct environment and persistent volume:
+
+```sh
+cd ~/tidal-mcp-app
+docker compose stop tidal-mcp
+docker compose run --rm --no-deps -T tidal-mcp npm run access-tokens -- list
+# Run other CLI commands with the same Compose prefix; use /data/NAME.token for --out.
+docker compose up -d tidal-mcp
+```
+
+See [BEARER_TOKENS.md](docs/BEARER_TOKENS.md) for rotation, lifetimes, client setup and private-file handling.
+
 ## Repository map
 
 `src/core/` contains authentication, storage, policy, JSON:API handling and business operations. `src/adapters/` integrates the TIDAL SDK. `src/mcp/` registers the official MCP tools and UI resource. `web/` contains the component and semantic CSS. `tests/core/`, `tests/mcp/` and `tests/browser/` separate evidence by layer. `scripts/` supplies build, demo, login, documentation, schema inventory and audit verification. `docs/` provides operating and contract documentation. `audit/` preserves executed results, screenshots, findings and integrity hashes.

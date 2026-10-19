@@ -62,4 +62,13 @@ export class AgentTokens {
       for (const [key,a] of Object.entries(s.access)) if (a.familyId === id) delete s.access[key];
     });
   }
+  async delete(id) {
+    await this.store.tx(s => {
+      const f = s.families[id];
+      if (!f || f.kind !== 'agent-token') fail('AGENT_TOKEN_INVALID', 'Unknown agent token.');
+      for (const table of ['access','refresh']) for (const [key,record] of Object.entries(s[table])) if (record.familyId === id) delete s[table][key];
+      delete s.families[id];
+      // Keep the account, audit history and mutation recovery records intact.
+    });
+  }
 }

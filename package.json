@@ -14,6 +14,7 @@
     "login": "node --env-file-if-exists=.env scripts/login.mjs",
     "logout": "node --env-file-if-exists=.env scripts/logout.mjs",
     "keygen": "node scripts/keygen.mjs",
+    "access-tokens": "node --env-file-if-exists=.env scripts/agent-token.mjs",
     "build": "node scripts/build.mjs",
     "tokens": "node scripts/tokens.mjs",
     "demo": "node scripts/demo.mjs",

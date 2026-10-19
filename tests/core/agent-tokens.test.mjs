@@ -51,6 +51,34 @@ test('revocation affects one agent; account disconnect invalidates all agent tok
   assert.throws(() => f.broker.verify(b.token),e => e.code === 'invalid_token');
 });
 
+test('deleting an active token invalidates it while preserving other agents, OAuth and recovery state', async () => {
+  const f = await setup(), a = await f.issue(), b = await f.issue();
+  await f.store.tx(s => {
+    s.families.oauth = {kind:'oauth',grantId:f.principal.grantId};
+    s.refresh.oldAgent = {familyId:a.id}; s.refresh.oauth = {familyId:'oauth'};
+    s.plans.uncertain = {grantId:f.principal.grantId,clientId:f.broker.verify(a.token).clientId,status:'unknown',idempotencyKey:'keep-this-key'};
+  });
+  const before = f.store.read(s => ({grant:s.grants[f.principal.grantId],plan:s.plans.uncertain,oauth:s.families.oauth}));
+  await f.tokens.delete(a.id);
+  assert.throws(() => f.broker.verify(a.token),e => e.code === 'invalid_token');
+  assert.ok(f.broker.verify(b.token)); assert.ok(!f.tokens.list().some(t => t.id === a.id));
+  assert.equal(f.store.read(s => s.refresh.oldAgent),undefined);
+  assert.deepEqual(f.store.read(s => ({grant:s.grants[f.principal.grantId],plan:s.plans.uncertain,oauth:s.families.oauth})),before);
+  assert.ok(f.store.read(s => s.refresh.oauth));
+  await assert.rejects(f.tokens.delete('oauth'),e => e.code === 'AGENT_TOKEN_INVALID');
+  await assert.rejects(f.tokens.delete('unknown'),e => e.code === 'AGENT_TOKEN_INVALID');
+});
+
+test('CLI help works without server credentials or state', () => {
+  const script = fileURLToPath(new URL('../../scripts/agent-token.mjs',import.meta.url));
+  for (const args of [[],['--help'],['create','--help']]) {
+    const result = spawnSync(process.execPath,[script,...args],{env:{},encoding:'utf8'});
+    assert.equal(result.status,0,result.stderr);
+    assert.match(result.stdout,/revoke ID/); assert.match(result.stdout,/delete ID/);
+    assert.match(result.stdout,/Stop the owning server first/);
+  }
+});
+
 test('read-only tokens cannot prepare writes; write tokens cannot use another agent preview', async () => {
   const f = await setup(), read = await f.issue(), a = await f.issue({scopes:['tidal:read','tidal:write']}), b = await f.issue({scopes:['tidal:read','tidal:write']});
   const change = {action:'create_playlist',name:'Synthetic token test'};
@@ -129,8 +157,15 @@ test('operator CLI preserves encrypted state, private output and single-writer l
   const reopened = new EncryptedStore(env.DATA_DIR,key);
   assert.ok(reopened.read(s => s.access[sha256(token)]));
   assert.notEqual(run(['list']).status,0); reopened.close();
-  assert.equal(run(['revoke','--id',meta.id]).status,0);
+  assert.notEqual(run(['revoke',meta.id,'--id',meta.id]).status,0);
+  assert.equal(run(['revoke',meta.id]).status,0);
+  assert.equal(JSON.parse(run(['list']).stdout).find(t => t.id === meta.id).revoked,true);
+  const deleted = run(['delete',meta.id]); assert.equal(deleted.status,0,deleted.stderr);
+  assert.equal(JSON.parse(deleted.stdout).deleted,true);
+  assert.ok(!JSON.parse(run(['list']).stdout).some(t => t.id === meta.id));
   const final = new EncryptedStore(env.DATA_DIR,key);
-  assert.equal(final.read(s => s.access[sha256(token)]),undefined); final.close();
+  assert.equal(final.read(s => s.access[sha256(token)]),undefined);
+  assert.equal(final.read(s => s.families[meta.id]),undefined); final.close();
+  assert.equal(fs.readFileSync(out,'utf8').trim(),token);
   assert.ok(!fs.readFileSync(path.join(env.DATA_DIR,'audit.jsonl'),'utf8').includes(token));
 });
