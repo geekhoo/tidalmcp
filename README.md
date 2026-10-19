@@ -119,6 +119,8 @@ Leave `ENABLE_WRITES=false` for initial validation. To enable changes, set it to
 
 Use one bearer token per agent sharing your linked TIDAL account. The CLI loads `.env` when present; use the server's state directory, encryption key and public origin. **Stop the owning server before managing tokens**, then restart it afterward.
 
+Run `npm run access-tokens` in a terminal for an interactive menu. Choose an account or token by number, enter the new token's name, permissions, lifetime and private output path, then confirm. No copying IDs is needed. Accounts are shown by fingerprint and link date; tokens are shown by name, status and expiry. Existing commands remain available for scripting:
+
 ```sh
 npm run access-tokens -- --help
 npm run access-tokens -- grants
@@ -135,10 +137,11 @@ On the active Fedora deployment, run the CLI inside Compose so it uses the corre
 ```sh
 cd ~/tidal-mcp-app
 docker compose stop tidal-mcp
-docker compose run --rm --no-deps -T tidal-mcp npm run access-tokens -- list
-# Run other CLI commands with the same Compose prefix; use /data/NAME.token for --out.
+docker compose run --rm --no-deps tidal-mcp npm run access-tokens
 docker compose up -d tidal-mcp
 ```
+
+Keep the terminal attached: omit `-T` for the interactive menu. Press `0` or Ctrl+C to exit, then restart the server. For scripted commands, add `-T` and the command arguments; use `/data/NAME.token` for `--out` inside Compose.
 
 See [BEARER_TOKENS.md](docs/BEARER_TOKENS.md) for rotation, lifetimes, client setup and private-file handling.
 

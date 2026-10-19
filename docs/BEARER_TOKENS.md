@@ -21,6 +21,19 @@ This implementation is an operator-provisioned credential extension alongside OA
 
 Use `npm run access-tokens -- --help` for the CLI. It loads `.env` when present and supports `grants`, `list`, `create`, `rotate`, `revoke` and `delete`. `grants` lists safe account references and subject hashes; it does not print upstream tokens or profile attributes. `list` prints token metadata, never secrets.
 
+For interactive management, stop the owning server and run `npm run access-tokens` in a terminal (or `npm run access-tokens -- interactive`). The numbered menu offers create, list, revoke and delete. It lists active linked grants by account fingerprint and link date; choose one, then enter the agent name, permissions, lifetime and private file path. Token selection uses names, status and expiry. Create/revoke/delete require confirmation, defaulting to cancellation. Choosing `0` goes back or exits; Ctrl+C exits. The server is not restarted automatically.
+
+On Fedora, use a terminal and omit `-T` so Compose preserves interactive input:
+
+```sh
+cd ~/tidal-mcp-app
+docker compose stop tidal-mcp
+docker compose run --rm --no-deps tidal-mcp npm run access-tokens
+docker compose up -d tidal-mcp
+```
+
+The default private output is a unique file under `DATA_DIR` (`/data` in Compose). Secrets are never displayed. Without a terminal, invoking the CLI with no arguments prints help; explicit interactive mode reports that a terminal is required. Scripted commands below continue to work without a terminal.
+
 For a local installation, stop the owning server, then run:
 
 ```sh

@@ -10,7 +10,9 @@ import { fail, publicError, sha256 } from '../src/core/util.mjs';
 
 const HELP = `Manage TIDAL MCP agent access tokens
 
-Usage: npm run access-tokens -- COMMAND [options]
+Usage: npm run access-tokens                    Open the interactive menu in a terminal
+       npm run access-tokens -- interactive     Open the interactive menu explicitly
+       npm run access-tokens -- COMMAND [options]
 
   grants                         Show linked account IDs and granted scopes
   list                           List token IDs, names, scopes and expiry
@@ -70,6 +72,13 @@ export async function run(argv) {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  try { const result = await run(process.argv.slice(2)); console.log(typeof result === 'string' ? result : JSON.stringify(result,null,2)); }
+  try {
+    const args = process.argv.slice(2);
+    const menu = !args.length && process.stdin.isTTY && process.stdout.isTTY || args.length === 1 && args[0] === 'interactive';
+    if (menu) {
+      if (!process.stdin.isTTY || !process.stdout.isTTY) fail('TERMINAL_REQUIRED', 'Interactive mode needs a terminal. For Compose, omit -T. Use --help for scripted commands.');
+      const {interactive} = await import('./agent-token-menu.mjs'); await interactive({execute:run});
+    } else { const result = await run(args); console.log(typeof result === 'string' ? result : JSON.stringify(result,null,2)); }
+  }
   catch (error) { console.error(JSON.stringify(publicError(error))); process.exitCode = 1; }
 }
